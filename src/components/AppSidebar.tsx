@@ -32,7 +32,7 @@ const navigation = [
   { name: "Investors", href: "/investors", icon: Users },
   { name: "Farms", href: "/farms", icon: MapPin },
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
-  { name: "Performance", href: "/performance", icon: TrendingUp },
+  { name: "Weight Performance", href: "/performance", icon: TrendingUp },
   { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
 ];
 
