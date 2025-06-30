@@ -8,7 +8,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { AnimalCard } from "@/components/AnimalCard";
-import { Search, Calendar } from "lucide-react";
+import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkpoint } from "@/types/checkpoint";
 
@@ -104,7 +104,7 @@ const WeightsVaccination = () => {
     return { checkpoints, arrivalDate: arrivalDateStr };
   };
 
-  // Mock data with CORRECTED 2025 dates
+  // Mock data with CORRECTED 2025 dates and Pakistani names
   const [animals, setAnimals] = useState(() => {
     const animalsData = [
       // Overdue animals - each has ONLY ONE overdue checkpoint
@@ -120,8 +120,8 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm A", 
         pen: "Pen 3", 
-        investor: "John Smith",
-        doctor: "Dr. Johnson",
+        investor: "Muhammad Ali Khan",
+        doctor: "Dr. Ahmed Hassan",
         price: 45000,
         ratePerKg: 112.5,
         mandi: "Central Market",
@@ -141,8 +141,8 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm C", 
         pen: "Pen 1", 
-        investor: "Mike Wilson",
-        doctor: "Dr. Brown",
+        investor: "Fatima Sheikh",
+        doctor: "Dr. Zafar Iqbal",
         price: 32000,
         ratePerKg: 110,
         mandi: "Local Market",
@@ -162,12 +162,12 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm B", 
         pen: "Pen 4", 
-        investor: "Lisa Davis",
-        doctor: "Dr. Smith",
+        investor: "Asad Rahman",
+        doctor: "Dr. Sana Malik",
         price: 52000,
         ratePerKg: 108,
         mandi: "Premium Market",
-        purchaser: "John Doe",
+        purchaser: "Hassan Ahmed",
         targetStatus: 'overdue' as const,
         targetDay: 3
       },
@@ -184,12 +184,12 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm B", 
         pen: "Pen 1", 
-        investor: "Sarah Johnson",
-        doctor: "Dr. Smith",
+        investor: "Zainab Hussain",
+        doctor: "Dr. Tariq Mahmood",
         price: 38500,
         ratePerKg: 110,
         mandi: "Livestock Market",
-        purchaser: "John Doe",
+        purchaser: "Hassan Ahmed",
         targetStatus: 'due-today' as const,
         targetDay: 21
       },
@@ -205,8 +205,8 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm A", 
         pen: "Pen 5", 
-        investor: "Tom Anderson",
-        doctor: "Dr. Johnson",
+        investor: "Usman Malik",
+        doctor: "Dr. Ahmed Hassan",
         price: 39500,
         ratePerKg: 109,
         mandi: "Central Market",
@@ -226,12 +226,12 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm C", 
         pen: "Pen 2", 
-        investor: "Emma Thompson",
-        doctor: "Dr. Brown",
+        investor: "Khadija Awan",
+        doctor: "Dr. Zafar Iqbal",
         price: 43000,
         ratePerKg: 107,
         mandi: "Regional Market",
-        purchaser: "John Doe",
+        purchaser: "Hassan Ahmed",
         targetStatus: 'due-today' as const,
         targetDay: 50
       },
@@ -248,7 +248,7 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm A", 
         pen: "Pen 2",
-        doctor: "Dr. Johnson",
+        doctor: "Dr. Ahmed Hassan",
         price: 30800,
         ratePerKg: 110,
         mandi: "Regional Market",
@@ -268,12 +268,12 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm B", 
         pen: "Pen 3", 
-        investor: "Robert Lee",
-        doctor: "Dr. Smith",
+        investor: "Naveed Siddiqui",
+        doctor: "Dr. Sana Malik",
         price: 46500,
         ratePerKg: 108,
         mandi: "Livestock Market",
-        purchaser: "John Doe",
+        purchaser: "Hassan Ahmed",
         targetStatus: 'due-tomorrow' as const,
         targetDay: 21
       },
@@ -289,8 +289,8 @@ const WeightsVaccination = () => {
         status: "Active", 
         farm: "Farm C", 
         pen: "Pen 6", 
-        investor: "Nancy White",
-        doctor: "Dr. Brown",
+        investor: "Ayesha Nasir",
+        doctor: "Dr. Zafar Iqbal",
         price: 31000,
         ratePerKg: 109,
         mandi: "Local Market",
@@ -385,13 +385,6 @@ const WeightsVaccination = () => {
     ));
   };
 
-  const handleDataEntry = () => {
-    toast({
-      title: "Data Entry",
-      description: "Opening comprehensive weights & vaccination entry form..."
-    });
-  };
-
   const { overdue, dueToday, dueTomorrow } = getStatusCounts();
 
   return (
@@ -408,10 +401,6 @@ const WeightsVaccination = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Weights & Vaccination</h1>
                 <p className="text-gray-600 mt-1">Monitor and update animal health data</p>
               </div>
-              <Button onClick={handleDataEntry} className="bg-green-600 hover:bg-green-700">
-                <Calendar className="h-4 w-4 mr-2" />
-                Enter Weights & Vaccination
-              </Button>
             </div>
 
             {/* Tabs Section */}
