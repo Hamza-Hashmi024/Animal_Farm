@@ -117,6 +117,7 @@ export function ReportIncidentDialog() {
                     <SelectContent>
                       <SelectItem value="injury">Injury</SelectItem>
                       <SelectItem value="illness">Illness</SelectItem>
+                      <SelectItem value="death">Death</SelectItem>
                       <SelectItem value="behavioral">Behavioral</SelectItem>
                       <SelectItem value="transport-stress">Transport Stress</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
