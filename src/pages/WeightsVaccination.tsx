@@ -426,23 +426,15 @@ const WeightsVaccination = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Search Section */}
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Search className="h-5 w-5" />
-                    Search Animals
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input
-                    placeholder="Search by tag, Sr. No., breed, investor, or doctor..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full"
-                  />
-                </CardContent>
-              </Card>
+              {/* Quick Search - Simplified */}
+              <div className="mt-4 mb-6">
+                <Input
+                  placeholder="Quick search by tag, breed, investor..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="max-w-md"
+                />
+              </div>
 
               {/* Tab Content */}
               <TabsContent value="overdue" className="mt-6">
