@@ -9,12 +9,12 @@ export function DashboardHeader() {
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
           <h1 className="text-xl font-semibold text-gray-900">Livestock Performance Management</h1>
-          <p className="text-sm text-blue-600 font-medium">Solutyics (Pvt) Ltd.</p>
+          <p className="text-sm text-blue-600 font-medium">By Solutyics (Pvt) Ltd.</p>
         </div>
         
         <div className="flex items-center space-x-4">
           <Badge variant="secondary" className="bg-green-100 text-green-800">
-            Live System
+            Demo
           </Badge>
           
           <Button variant="outline" size="sm">

@@ -57,9 +57,11 @@ export function AppSidebar() {
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
         {!collapsed && (
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">🐄</span>
-            </div>
+            <img 
+              src="/lovable-uploads/793815d0-c69a-4de6-85a2-c9843412d22e.png" 
+              alt="Solutyics Logo" 
+              className="w-8 h-8"
+            />
             <span className="font-bold text-gray-900">LPMS</span>
           </div>
         )}
