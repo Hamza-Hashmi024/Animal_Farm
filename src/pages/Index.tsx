@@ -110,6 +110,7 @@ const Index = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <AnimalCard 
                     tag="TAG-001"
+                    srNo="001"
                     breed="Holstein"
                     weight={450}
                     adg={1.3}
@@ -119,6 +120,7 @@ const Index = () => {
                   />
                   <AnimalCard 
                     tag="TAG-002"
+                    srNo="002"
                     breed="Angus"
                     weight={387}
                     adg={1.1}
@@ -128,6 +130,7 @@ const Index = () => {
                   />
                   <AnimalCard 
                     tag="TAG-003"
+                    srNo="003"
                     breed="Hereford"
                     weight={298}
                     adg={0.9}
