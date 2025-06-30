@@ -17,11 +17,27 @@ const WeightsVaccination = () => {
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
-  // Helper function to create sequential checkpoint schedule with PROPER logic
-  const createCheckpointSchedule = (animalTag: string, arrivalDate: string, targetStatus: 'overdue' | 'due-today' | 'due-tomorrow', targetDay: number) => {
-    const arrival = new Date(arrivalDate);
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  // Helper function to create realistic checkpoint schedule for 2025
+  const createCheckpointSchedule = (animalTag: string, targetStatus: 'overdue' | 'due-today' | 'due-tomorrow', targetDay: number) => {
+    const today = new Date('2025-06-30'); // Today is June 30th, 2025
+    const todayStr = today.toISOString().split('T')[0];
+    const tomorrow = new Date('2025-07-01');
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
+    // Calculate arrival date based on target checkpoint and status
+    let targetDate: Date;
+    if (targetStatus === 'overdue') {
+      targetDate = new Date('2025-06-28'); // Make target checkpoint 2 days overdue
+    } else if (targetStatus === 'due-today') {
+      targetDate = today;
+    } else { // due-tomorrow
+      targetDate = tomorrow;
+    }
+    
+    // Calculate arrival date by subtracting target day from target date
+    const arrivalDate = new Date(targetDate);
+    arrivalDate.setDate(targetDate.getDate() - targetDay);
+    const arrivalDateStr = arrivalDate.toISOString().split('T')[0];
     
     const checkpoints: Checkpoint[] = [];
     const days = [0, 3, 7, 21, 50, 75];
@@ -29,40 +45,35 @@ const WeightsVaccination = () => {
     
     for (let i = 0; i < days.length; i++) {
       const day = days[i];
-      const scheduledDate = new Date(arrival.getTime() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const scheduledDate = new Date(arrivalDate);
+      scheduledDate.setDate(arrivalDate.getDate() + day);
+      const scheduledDateStr = scheduledDate.toISOString().split('T')[0];
       
       let completed = false;
       let actualDate = undefined;
       let weight = undefined;
-      let finalScheduledDate = scheduledDate;
       
       // Day 0 (arrival) is ALWAYS completed
       if (day === 0) {
         completed = true;
-        actualDate = arrivalDate;
+        actualDate = arrivalDateStr;
         weight = 400;
       }
       // Complete all checkpoints BEFORE the target day
       else if (day < targetDay) {
         completed = true;
-        actualDate = scheduledDate;
+        actualDate = scheduledDateStr;
         weight = 400 + (day * 10);
       }
-      // The target day gets the specific status
+      // The target day - this is the one that should be overdue/due today/due tomorrow
       else if (day === targetDay) {
         completed = false;
-        if (targetStatus === 'overdue') {
-          finalScheduledDate = "2024-06-25"; // Make it clearly overdue
-        } else if (targetStatus === 'due-today') {
-          finalScheduledDate = today;
-        } else if (targetStatus === 'due-tomorrow') {
-          finalScheduledDate = tomorrow;
-        }
+        // scheduledDateStr is already calculated correctly above
       }
       // All days AFTER the target day remain upcoming (not completed, future dates)
       else {
         completed = false;
-        // Keep future scheduled dates as they are
+        // Future checkpoints keep their calculated future dates
       }
       
       checkpoints.push({
@@ -70,7 +81,7 @@ const WeightsVaccination = () => {
         animalTag,
         day,
         name: names[i],
-        scheduledDate: finalScheduledDate,
+        scheduledDate: scheduledDateStr,
         completed,
         actualDate,
         weight,
@@ -78,7 +89,7 @@ const WeightsVaccination = () => {
         ...(completed && day > 0 ? {
           vaccine: {
             name: `Vaccine-${day}`,
-            batch: `BATCH-${day}-2024`,
+            batch: `BATCH-${day}-2025`,
             dose: "2ml"
           },
           dewormer: {
@@ -90,212 +101,221 @@ const WeightsVaccination = () => {
       });
     }
 
-    return checkpoints;
+    return { checkpoints, arrivalDate: arrivalDateStr };
   };
 
-  // Mock data with CORRECTED checkpoint logic
-  const [animals, setAnimals] = useState([
-    // Overdue animals - each has ONLY ONE overdue checkpoint
-    { 
-      tag: "TAG-001", 
-      srNo: "001",
-      breed: "Holstein", 
-      coatColor: "Black & White",
-      age: 18,
-      weight: 450, 
-      arrivalWeight: 400,
-      adg: 1.3, 
-      status: "Active", 
-      farm: "Farm A", 
-      pen: "Pen 3", 
-      investor: "John Smith",
-      doctor: "Dr. Johnson",
-      purchaseDate: "2024-01-15",
-      price: 45000,
-      ratePerKg: 112.5,
-      mandi: "Central Market",
-      purchaser: "Farm Manager",
-      arrivalDate: "2024-01-15",
-      checkpoints: createCheckpointSchedule("TAG-001", "2024-01-15", 'overdue', 21) // Day 21 overdue, 0,3,7 completed, 50,75 upcoming
-    },
-    { 
-      tag: "TAG-004", 
-      srNo: "004",
-      breed: "Jersey", 
-      coatColor: "Brown",
-      age: 16,
-      weight: 320, 
-      arrivalWeight: 290,
-      adg: 1.0, 
-      status: "Active", 
-      farm: "Farm C", 
-      pen: "Pen 1", 
-      investor: "Mike Wilson",
-      doctor: "Dr. Brown",
-      purchaseDate: "2024-02-20",
-      price: 32000,
-      ratePerKg: 110,
-      mandi: "Local Market",
-      purchaser: "Farm Manager",
-      arrivalDate: "2024-02-20",
-      checkpoints: createCheckpointSchedule("TAG-004", "2024-02-20", 'overdue', 7) // Day 7 overdue, 0,3 completed, 21,50,75 upcoming
-    },
-    { 
-      tag: "TAG-007", 
-      srNo: "007",
-      breed: "Simmental", 
-      coatColor: "Red & White",
-      age: 20,
-      weight: 520, 
-      arrivalWeight: 480,
-      adg: 1.4, 
-      status: "Active", 
-      farm: "Farm B", 
-      pen: "Pen 4", 
-      investor: "Lisa Davis",
-      doctor: "Dr. Smith",
-      purchaseDate: "2024-01-10",
-      price: 52000,
-      ratePerKg: 108,
-      mandi: "Premium Market",
-      purchaser: "John Doe",
-      arrivalDate: "2024-01-10",
-      checkpoints: createCheckpointSchedule("TAG-007", "2024-01-10", 'overdue', 3) // Day 3 overdue, 0 completed, 7,21,50,75 upcoming
-    },
-    // Due today animals - each has ONLY ONE checkpoint due today
-    { 
-      tag: "TAG-002", 
-      srNo: "002",
-      breed: "Angus", 
-      coatColor: "Black",
-      age: 15,
-      weight: 387, 
-      arrivalWeight: 350,
-      adg: 1.1, 
-      status: "Active", 
-      farm: "Farm B", 
-      pen: "Pen 1", 
-      investor: "Sarah Johnson",
-      doctor: "Dr. Smith",
-      purchaseDate: "2024-02-10",
-      price: 38500,
-      ratePerKg: 110,
-      mandi: "Livestock Market",
-      purchaser: "John Doe",
-      arrivalDate: "2024-02-10",
-      checkpoints: createCheckpointSchedule("TAG-002", "2024-02-10", 'due-today', 21) // Day 21 due today, 0,3,7 completed, 50,75 upcoming
-    },
-    { 
-      tag: "TAG-005", 
-      srNo: "005",
-      breed: "Charolais", 
-      coatColor: "Cream",
-      age: 14,
-      weight: 395, 
-      arrivalWeight: 360,
-      adg: 1.2, 
-      status: "Active", 
-      farm: "Farm A", 
-      pen: "Pen 5", 
-      investor: "Tom Anderson",
-      doctor: "Dr. Johnson",
-      purchaseDate: "2024-03-15",
-      price: 39500,
-      ratePerKg: 109,
-      mandi: "Central Market",
-      purchaser: "Farm Manager",
-      arrivalDate: "2024-03-15",
-      checkpoints: createCheckpointSchedule("TAG-005", "2024-03-15", 'due-today', 3) // Day 3 due today, 0 completed, 7,21,50,75 upcoming
-    },
-    { 
-      tag: "TAG-008", 
-      srNo: "008",
-      breed: "Limousin", 
-      coatColor: "Golden",
-      age: 17,
-      weight: 430, 
-      arrivalWeight: 400,
-      adg: 1.0, 
-      status: "Active", 
-      farm: "Farm C", 
-      pen: "Pen 2", 
-      investor: "Emma Thompson",
-      doctor: "Dr. Brown",
-      purchaseDate: "2024-02-05",
-      price: 43000,
-      ratePerKg: 107,
-      mandi: "Regional Market",
-      purchaser: "John Doe",
-      arrivalDate: "2024-02-05",
-      checkpoints: createCheckpointSchedule("TAG-008", "2024-02-05", 'due-today', 50) // Day 50 due today, 0,3,7,21 completed, 75 upcoming
-    },
-    // Due tomorrow animals - each has ONLY ONE checkpoint due tomorrow
-    { 
-      tag: "TAG-003", 
-      srNo: "003",
-      breed: "Hereford", 
-      coatColor: "Red & White",
-      age: 12,
-      weight: 298, 
-      arrivalWeight: 280,
-      adg: 0.9, 
-      status: "Active", 
-      farm: "Farm A", 
-      pen: "Pen 2",
-      doctor: "Dr. Johnson",
-      purchaseDate: "2024-03-05",
-      price: 30800,
-      ratePerKg: 110,
-      mandi: "Regional Market",
-      purchaser: "Farm Manager",
-      arrivalDate: "2024-03-05",
-      checkpoints: createCheckpointSchedule("TAG-003", "2024-03-05", 'due-tomorrow', 7) // Day 7 due tomorrow, 0,3 completed, 21,50,75 upcoming
-    },
-    { 
-      tag: "TAG-006", 
-      srNo: "006",
-      breed: "Brahman", 
-      coatColor: "Gray",
-      age: 19,
-      weight: 465, 
-      arrivalWeight: 430,
-      adg: 1.1, 
-      status: "Active", 
-      farm: "Farm B", 
-      pen: "Pen 3", 
-      investor: "Robert Lee",
-      doctor: "Dr. Smith",
-      purchaseDate: "2024-01-25",
-      price: 46500,
-      ratePerKg: 108,
-      mandi: "Livestock Market",
-      purchaser: "John Doe",
-      arrivalDate: "2024-01-25",
-      checkpoints: createCheckpointSchedule("TAG-006", "2024-01-25", 'due-tomorrow', 21) // Day 21 due tomorrow, 0,3,7 completed, 50,75 upcoming
-    },
-    { 
-      tag: "TAG-009", 
-      srNo: "009",
-      breed: "Shorthorn", 
-      coatColor: "Roan",
-      age: 13,
-      weight: 310, 
-      arrivalWeight: 285,
-      adg: 0.8, 
-      status: "Active", 
-      farm: "Farm C", 
-      pen: "Pen 6", 
-      investor: "Nancy White",
-      doctor: "Dr. Brown",
-      purchaseDate: "2024-03-20",
-      price: 31000,
-      ratePerKg: 109,
-      mandi: "Local Market",
-      purchaser: "Farm Manager",
-      arrivalDate: "2024-03-20",
-      checkpoints: createCheckpointSchedule("TAG-009", "2024-03-20", 'due-tomorrow', 3) // Day 3 due tomorrow, 0 completed, 7,21,50,75 upcoming
-    }
-  ]);
+  // Mock data with CORRECTED 2025 dates
+  const [animals, setAnimals] = useState(() => {
+    const animalsData = [
+      // Overdue animals - each has ONLY ONE overdue checkpoint
+      { 
+        tag: "TAG-001", 
+        srNo: "001",
+        breed: "Holstein", 
+        coatColor: "Black & White",
+        age: 18,
+        weight: 450, 
+        arrivalWeight: 400,
+        adg: 1.3, 
+        status: "Active", 
+        farm: "Farm A", 
+        pen: "Pen 3", 
+        investor: "John Smith",
+        doctor: "Dr. Johnson",
+        price: 45000,
+        ratePerKg: 112.5,
+        mandi: "Central Market",
+        purchaser: "Farm Manager",
+        targetStatus: 'overdue' as const,
+        targetDay: 21
+      },
+      { 
+        tag: "TAG-004", 
+        srNo: "004",
+        breed: "Jersey", 
+        coatColor: "Brown",
+        age: 16,
+        weight: 320, 
+        arrivalWeight: 290,
+        adg: 1.0, 
+        status: "Active", 
+        farm: "Farm C", 
+        pen: "Pen 1", 
+        investor: "Mike Wilson",
+        doctor: "Dr. Brown",
+        price: 32000,
+        ratePerKg: 110,
+        mandi: "Local Market",
+        purchaser: "Farm Manager",
+        targetStatus: 'overdue' as const,
+        targetDay: 7
+      },
+      { 
+        tag: "TAG-007", 
+        srNo: "007",
+        breed: "Simmental", 
+        coatColor: "Red & White",
+        age: 20,
+        weight: 520, 
+        arrivalWeight: 480,
+        adg: 1.4, 
+        status: "Active", 
+        farm: "Farm B", 
+        pen: "Pen 4", 
+        investor: "Lisa Davis",
+        doctor: "Dr. Smith",
+        price: 52000,
+        ratePerKg: 108,
+        mandi: "Premium Market",
+        purchaser: "John Doe",
+        targetStatus: 'overdue' as const,
+        targetDay: 3
+      },
+      // Due today animals - each has ONLY ONE checkpoint due today
+      { 
+        tag: "TAG-002", 
+        srNo: "002",
+        breed: "Angus", 
+        coatColor: "Black",
+        age: 15,
+        weight: 387, 
+        arrivalWeight: 350,
+        adg: 1.1, 
+        status: "Active", 
+        farm: "Farm B", 
+        pen: "Pen 1", 
+        investor: "Sarah Johnson",
+        doctor: "Dr. Smith",
+        price: 38500,
+        ratePerKg: 110,
+        mandi: "Livestock Market",
+        purchaser: "John Doe",
+        targetStatus: 'due-today' as const,
+        targetDay: 21
+      },
+      { 
+        tag: "TAG-005", 
+        srNo: "005",
+        breed: "Charolais", 
+        coatColor: "Cream",
+        age: 14,
+        weight: 395, 
+        arrivalWeight: 360,
+        adg: 1.2, 
+        status: "Active", 
+        farm: "Farm A", 
+        pen: "Pen 5", 
+        investor: "Tom Anderson",
+        doctor: "Dr. Johnson",
+        price: 39500,
+        ratePerKg: 109,
+        mandi: "Central Market",
+        purchaser: "Farm Manager",
+        targetStatus: 'due-today' as const,
+        targetDay: 3
+      },
+      { 
+        tag: "TAG-008", 
+        srNo: "008",
+        breed: "Limousin", 
+        coatColor: "Golden",
+        age: 17,
+        weight: 430, 
+        arrivalWeight: 400,
+        adg: 1.0, 
+        status: "Active", 
+        farm: "Farm C", 
+        pen: "Pen 2", 
+        investor: "Emma Thompson",
+        doctor: "Dr. Brown",
+        price: 43000,
+        ratePerKg: 107,
+        mandi: "Regional Market",
+        purchaser: "John Doe",
+        targetStatus: 'due-today' as const,
+        targetDay: 50
+      },
+      // Due tomorrow animals - each has ONLY ONE checkpoint due tomorrow
+      { 
+        tag: "TAG-003", 
+        srNo: "003",
+        breed: "Hereford", 
+        coatColor: "Red & White",
+        age: 12,
+        weight: 298, 
+        arrivalWeight: 280,
+        adg: 0.9, 
+        status: "Active", 
+        farm: "Farm A", 
+        pen: "Pen 2",
+        doctor: "Dr. Johnson",
+        price: 30800,
+        ratePerKg: 110,
+        mandi: "Regional Market",
+        purchaser: "Farm Manager",
+        targetStatus: 'due-tomorrow' as const,
+        targetDay: 7
+      },
+      { 
+        tag: "TAG-006", 
+        srNo: "006",
+        breed: "Brahman", 
+        coatColor: "Gray",
+        age: 19,
+        weight: 465, 
+        arrivalWeight: 430,
+        adg: 1.1, 
+        status: "Active", 
+        farm: "Farm B", 
+        pen: "Pen 3", 
+        investor: "Robert Lee",
+        doctor: "Dr. Smith",
+        price: 46500,
+        ratePerKg: 108,
+        mandi: "Livestock Market",
+        purchaser: "John Doe",
+        targetStatus: 'due-tomorrow' as const,
+        targetDay: 21
+      },
+      { 
+        tag: "TAG-009", 
+        srNo: "009",
+        breed: "Shorthorn", 
+        coatColor: "Roan",
+        age: 13,
+        weight: 310, 
+        arrivalWeight: 285,
+        adg: 0.8, 
+        status: "Active", 
+        farm: "Farm C", 
+        pen: "Pen 6", 
+        investor: "Nancy White",
+        doctor: "Dr. Brown",
+        price: 31000,
+        ratePerKg: 109,
+        mandi: "Local Market",
+        purchaser: "Farm Manager",
+        targetStatus: 'due-tomorrow' as const,
+        targetDay: 3
+      }
+    ];
+
+    // Generate checkpoints and arrival dates for each animal
+    return animalsData.map(animal => {
+      const { checkpoints, arrivalDate } = createCheckpointSchedule(
+        animal.tag, 
+        animal.targetStatus, 
+        animal.targetDay
+      );
+      
+      return {
+        ...animal,
+        arrivalDate,
+        purchaseDate: arrivalDate,
+        checkpoints
+      };
+    });
+  });
 
   // Helper function to get status counts based on checkpoints
   const getStatusCounts = () => {
