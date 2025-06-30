@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,11 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { AnimalCard } from "@/components/AnimalCard";
 import { AddAnimalDialog } from "@/components/AddAnimalDialog";
 import { Search, Filter } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Animals = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
 
   // Updated mock data with full registration details
   const [animals, setAnimals] = useState([
@@ -149,6 +150,14 @@ const Animals = () => {
     setAnimals(prev => [...prev, newAnimal]);
   };
 
+  const handleWeightUpdate = (tag: string, newWeight: number) => {
+    setAnimals(prev => prev.map(animal => 
+      animal.tag === tag 
+        ? { ...animal, weight: newWeight }
+        : animal
+    ));
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -221,6 +230,7 @@ const Animals = () => {
                   ratePerKg={animal.ratePerKg}
                   mandi={animal.mandi}
                   purchaser={animal.purchaser}
+                  onWeightUpdate={handleWeightUpdate}
                 />
               ))}
             </div>

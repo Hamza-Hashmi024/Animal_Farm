@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, TrendingUp, TrendingDown, User, Stethoscope, Calendar, DollarSign, Clock, AlertTriangle } from "lucide-react";
+import { MoreHorizontal, TrendingUp, TrendingDown, User, Stethoscope, Calendar, DollarSign, Clock, AlertTriangle, Scale } from "lucide-react";
 import { ScheduledCheckpoints } from "./ScheduledCheckpoints";
+import { WeightUpdateDialog } from "./WeightUpdateDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkpoint } from "@/types/checkpoint";
 import { generateCheckpointSchedule, getOverdueCheckpoints, getDueCheckpoints } from "@/utils/checkpointUtils";
@@ -28,6 +30,7 @@ interface AnimalCardProps {
   mandi?: string;
   purchaser?: string;
   arrivalDate?: string;
+  onWeightUpdate?: (tag: string, newWeight: number) => void;
 }
 
 export function AnimalCard({ 
@@ -49,9 +52,11 @@ export function AnimalCard({
   ratePerKg,
   mandi,
   purchaser,
-  arrivalDate
+  arrivalDate,
+  onWeightUpdate
 }: AnimalCardProps) {
   const [showHealthDialog, setShowHealthDialog] = useState(false);
+  const [showWeightDialog, setShowWeightDialog] = useState(false);
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(
     generateCheckpointSchedule(tag, arrivalDate || purchaseDate || '2024-06-01')
   );
@@ -74,6 +79,12 @@ export function AnimalCard({
     setCheckpoints(prev => prev.map(cp => 
       cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
     ));
+  };
+
+  const handleWeightUpdate = (newWeight: number) => {
+    if (onWeightUpdate) {
+      onWeightUpdate(tag, newWeight);
+    }
   };
 
   return (
@@ -111,7 +122,18 @@ export function AnimalCard({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-medium text-gray-500">Current Weight</p>
-              <p className="text-xl font-bold">{weight} kg</p>
+              <div className="flex items-center space-x-2">
+                <p className="text-xl font-bold">{weight} kg</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setShowWeightDialog(true)}
+                  title="Update weight"
+                >
+                  <Scale className="h-3 w-3" />
+                </Button>
+              </div>
               {arrivalWeight && (
                 <p className="text-xs text-gray-500">From {arrivalWeight} kg</p>
               )}
@@ -219,6 +241,15 @@ export function AnimalCard({
           />
         </DialogContent>
       </Dialog>
+
+      {/* Weight Update Dialog */}
+      <WeightUpdateDialog
+        open={showWeightDialog}
+        onOpenChange={setShowWeightDialog}
+        animalTag={tag}
+        currentWeight={weight}
+        onWeightUpdate={handleWeightUpdate}
+      />
     </>
   );
 }
