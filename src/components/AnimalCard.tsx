@@ -32,7 +32,7 @@ interface AnimalCardProps {
   arrivalDate?: string;
   onWeightUpdate?: (tag: string, newWeight: number) => void;
   onCheckpointUpdate?: (animalTag: string, checkpoint: Checkpoint) => void;
-  checkpoints: Checkpoint[];
+  checkpoints?: Checkpoint[];
 }
 
 export function AnimalCard({ 
@@ -57,7 +57,7 @@ export function AnimalCard({
   arrivalDate,
   onWeightUpdate,
   onCheckpointUpdate,
-  checkpoints
+  checkpoints = []
 }: AnimalCardProps) {
   const [showHealthDialog, setShowHealthDialog] = useState(false);
   const [showWeightDialog, setShowWeightDialog] = useState(false);
