@@ -13,13 +13,13 @@ import { Search, Filter, Plus } from "lucide-react";
 const Investors = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock data for investors
+  // Mock data for investors with Pakistani names
   const investors = [
     { 
       id: "INV-001", 
-      name: "John Smith", 
-      email: "john.smith@email.com", 
-      phone: "+1-555-0123",
+      name: "Ahmed Ali Khan", 
+      email: "ahmed.khan@email.com", 
+      phone: "+92-300-1234567",
       totalInvestment: 75000, 
       animalsOwned: 8, 
       currentValue: 82500,
@@ -29,9 +29,9 @@ const Investors = () => {
     },
     { 
       id: "INV-002", 
-      name: "Sarah Johnson", 
-      email: "sarah.j@email.com", 
-      phone: "+1-555-0456",
+      name: "Fatima Sheikh", 
+      email: "fatima.sheikh@email.com", 
+      phone: "+92-321-9876543",
       totalInvestment: 120000, 
       animalsOwned: 12, 
       currentValue: 135000,
@@ -41,9 +41,9 @@ const Investors = () => {
     },
     { 
       id: "INV-003", 
-      name: "Michael Chen", 
-      email: "m.chen@email.com", 
-      phone: "+1-555-0789",
+      name: "Muhammad Hassan", 
+      email: "m.hassan@email.com", 
+      phone: "+92-333-5555555",
       totalInvestment: 50000, 
       animalsOwned: 5, 
       currentValue: 48000,
@@ -53,9 +53,9 @@ const Investors = () => {
     },
     { 
       id: "INV-004", 
-      name: "Emily Davis", 
-      email: "emily.davis@email.com", 
-      phone: "+1-555-0321",
+      name: "Ayesha Malik", 
+      email: "ayesha.malik@email.com", 
+      phone: "+92-345-7777777",
       totalInvestment: 95000, 
       animalsOwned: 10, 
       currentValue: 108000,
