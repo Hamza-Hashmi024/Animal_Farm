@@ -8,26 +8,31 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { AnimalCard } from "@/components/AnimalCard";
-import { Search, Filter, Plus } from "lucide-react";
+import { AddAnimalDialog } from "@/components/AddAnimalDialog";
+import { Search, Filter } from "lucide-react";
 
 const Animals = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Mock data for animals with investor assignments
-  const animals = [
+  const [animals, setAnimals] = useState([
     { tag: "TAG-001", breed: "Holstein", weight: 450, adg: 1.3, status: "Active", farm: "Farm A", pen: "Pen 3", investor: "John Smith" },
     { tag: "TAG-002", breed: "Angus", weight: 387, adg: 1.1, status: "Active", farm: "Farm B", pen: "Pen 1", investor: "Sarah Johnson" },
     { tag: "TAG-003", breed: "Hereford", weight: 298, adg: 0.9, status: "Quarantine", farm: "Farm A", pen: "Quarantine" },
     { tag: "TAG-004", breed: "Charolais", weight: 523, adg: 1.4, status: "Active", farm: "Farm C", pen: "Pen 2", investor: "Emily Davis" },
     { tag: "TAG-005", breed: "Limousin", weight: 412, adg: 1.2, status: "Active", farm: "Farm B", pen: "Pen 4", investor: "Michael Chen" },
     { tag: "TAG-006", breed: "Simmental", weight: 335, adg: 1.0, status: "Active", farm: "Farm A", pen: "Pen 1", investor: "John Smith" },
-  ];
+  ]);
 
   const filteredAnimals = animals.filter(animal =>
     animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
     animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleAddAnimal = (newAnimal: any) => {
+    setAnimals(prev => [...prev, newAnimal]);
+  };
 
   return (
     <SidebarProvider>
@@ -43,10 +48,7 @@ const Animals = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Animal Management</h1>
                 <p className="text-gray-600 mt-1">Manage and monitor all livestock across farms</p>
               </div>
-              <Button className="bg-green-600 hover:bg-green-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Animal
-              </Button>
+              <AddAnimalDialog onAddAnimal={handleAddAnimal} />
             </div>
 
             {/* Search and Filter Section */}
