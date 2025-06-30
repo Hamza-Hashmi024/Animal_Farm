@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,15 +10,16 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { AnimalCard } from "@/components/AnimalCard";
 import { Search, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Checkpoint } from "@/types/checkpoint";
 
 const WeightsVaccination = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
-  // Mock data for animals needing attention - 3 animals per category
+  // Mock data for animals needing attention - 3 animals per category with custom checkpoints
   const [animals, setAnimals] = useState([
-    // Overdue animals (3)
+    // Overdue animals (3) - each with 1 overdue checkpoint
     { 
       tag: "TAG-001", 
       srNo: "001",
@@ -42,7 +42,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-01-15",
       lastWeightCheck: "2024-06-20",
       lastVaccination: "2024-06-10",
-      dueStatus: "overdue"
+      dueStatus: "overdue",
+      checkpoints: [
+        {
+          id: "TAG-001-day-21",
+          animalTag: "TAG-001",
+          day: 21,
+          name: "Day 21 Check",
+          scheduledDate: "2024-06-25",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-004", 
@@ -66,7 +76,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-02-20",
       lastWeightCheck: "2024-06-22",
       lastVaccination: "2024-06-12",
-      dueStatus: "overdue"
+      dueStatus: "overdue",
+      checkpoints: [
+        {
+          id: "TAG-004-day-50",
+          animalTag: "TAG-004",
+          day: 50,
+          name: "Day 50 Check",
+          scheduledDate: "2024-06-27",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-007", 
@@ -90,9 +110,19 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-01-10",
       lastWeightCheck: "2024-06-18",
       lastVaccination: "2024-06-08",
-      dueStatus: "overdue"
+      dueStatus: "overdue",
+      checkpoints: [
+        {
+          id: "TAG-007-day-75",
+          animalTag: "TAG-007",
+          day: 75,
+          name: "Day 75 Check",
+          scheduledDate: "2024-06-28",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
-    // Due today animals (3)
+    // Due today animals (3) - each with 1 checkpoint due today
     { 
       tag: "TAG-002", 
       srNo: "002",
@@ -115,7 +145,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-02-10",
       lastWeightCheck: "2024-06-29",
       lastVaccination: "2024-06-25",
-      dueStatus: "due-today"
+      dueStatus: "due-today",
+      checkpoints: [
+        {
+          id: "TAG-002-day-21",
+          animalTag: "TAG-002",
+          day: 21,
+          name: "Day 21 Check",
+          scheduledDate: "2024-06-30",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-005", 
@@ -139,7 +179,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-03-15",
       lastWeightCheck: "2024-06-29",
       lastVaccination: "2024-06-26",
-      dueStatus: "due-today"
+      dueStatus: "due-today",
+      checkpoints: [
+        {
+          id: "TAG-005-day-50",
+          animalTag: "TAG-005",
+          day: 50,
+          name: "Day 50 Check",
+          scheduledDate: "2024-06-30",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-008", 
@@ -163,9 +213,19 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-02-05",
       lastWeightCheck: "2024-06-29",
       lastVaccination: "2024-06-26",
-      dueStatus: "due-today"
+      dueStatus: "due-today",
+      checkpoints: [
+        {
+          id: "TAG-008-day-7",
+          animalTag: "TAG-008",
+          day: 7,
+          name: "Day 7 Check",
+          scheduledDate: "2024-06-30",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
-    // Due tomorrow animals (3)
+    // Due tomorrow animals (3) - each with 1 checkpoint due tomorrow
     { 
       tag: "TAG-003", 
       srNo: "003",
@@ -187,7 +247,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-03-05",
       lastWeightCheck: "2024-06-28",
       lastVaccination: "2024-06-20",
-      dueStatus: "due-tomorrow"
+      dueStatus: "due-tomorrow",
+      checkpoints: [
+        {
+          id: "TAG-003-day-21",
+          animalTag: "TAG-003",
+          day: 21,
+          name: "Day 21 Check",
+          scheduledDate: "2024-07-01",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-006", 
@@ -211,7 +281,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-01-25",
       lastWeightCheck: "2024-06-28",
       lastVaccination: "2024-06-21",
-      dueStatus: "due-tomorrow"
+      dueStatus: "due-tomorrow",
+      checkpoints: [
+        {
+          id: "TAG-006-day-75",
+          animalTag: "TAG-006",
+          day: 75,
+          name: "Day 75 Check",
+          scheduledDate: "2024-07-01",
+          completed: false
+        }
+      ] as Checkpoint[]
     },
     { 
       tag: "TAG-009", 
@@ -235,7 +315,17 @@ const WeightsVaccination = () => {
       arrivalDate: "2024-03-20",
       lastWeightCheck: "2024-06-28",
       lastVaccination: "2024-06-22",
-      dueStatus: "due-tomorrow"
+      dueStatus: "due-tomorrow",
+      checkpoints: [
+        {
+          id: "TAG-009-day-50",
+          animalTag: "TAG-009",
+          day: 50,
+          name: "Day 50 Check",
+          scheduledDate: "2024-07-01",
+          completed: false
+        }
+      ] as Checkpoint[]
     }
   ]);
 
@@ -361,6 +451,7 @@ const WeightsVaccination = () => {
                       purchaser={animal.purchaser}
                       arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
+                      checkpoints={animal.checkpoints}
                     />
                   ))}
                 </div>
@@ -398,6 +489,7 @@ const WeightsVaccination = () => {
                       purchaser={animal.purchaser}
                       arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
+                      checkpoints={animal.checkpoints}
                     />
                   ))}
                 </div>
@@ -435,6 +527,7 @@ const WeightsVaccination = () => {
                       purchaser={animal.purchaser}
                       arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
+                      checkpoints={animal.checkpoints}
                     />
                   ))}
                 </div>

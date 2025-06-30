@@ -30,6 +30,7 @@ interface AnimalCardProps {
   purchaser?: string;
   arrivalDate?: string;
   onWeightUpdate?: (tag: string, newWeight: number) => void;
+  checkpoints?: Checkpoint[];
 }
 
 export function AnimalCard({ 
@@ -52,12 +53,15 @@ export function AnimalCard({
   mandi,
   purchaser,
   arrivalDate,
-  onWeightUpdate
+  onWeightUpdate,
+  checkpoints: providedCheckpoints
 }: AnimalCardProps) {
   const [showHealthDialog, setShowHealthDialog] = useState(false);
   const [showWeightDialog, setShowWeightDialog] = useState(false);
+  
+  // Use provided checkpoints if available, otherwise generate them
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(
-    generateCheckpointSchedule(tag, arrivalDate || purchaseDate || '2024-06-01')
+    providedCheckpoints || generateCheckpointSchedule(tag, arrivalDate || purchaseDate || '2024-06-01')
   );
 
   const getStatusColor = (status: string) => {
