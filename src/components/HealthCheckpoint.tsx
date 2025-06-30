@@ -24,7 +24,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
     actualDate: checkpoint.actualDate || new Date().toISOString().split('T')[0]
   });
 
+  const isViewMode = checkpoint.completed;
+
   const handleWeightChange = (weight: number) => {
+    if (isViewMode) return; // Don't allow changes in view mode
+    
     const weightGain = previousWeight ? weight - previousWeight : 0;
     const daysSinceLastCheck = checkpoint.day === 0 ? 0 : checkpoint.day - (checkpoint.day === 3 ? 0 : checkpoint.day === 7 ? 3 : checkpoint.day === 21 ? 7 : checkpoint.day === 50 ? 21 : 50);
     const adg = daysSinceLastCheck > 0 ? weightGain / daysSinceLastCheck : 0;
@@ -49,9 +53,13 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
           <DialogTitle className="flex items-center space-x-2">
             <Calendar className="h-5 w-5" />
             <span>{checkpoint.name} - {checkpoint.animalTag}</span>
+            {isViewMode && <Badge className="bg-green-100 text-green-800">Completed</Badge>}
           </DialogTitle>
           <DialogDescription>
             Day {checkpoint.day} checkpoint scheduled for {new Date(checkpoint.scheduledDate).toLocaleDateString()}
+            {checkpoint.actualDate && checkpoint.actualDate !== checkpoint.scheduledDate && (
+              <span> • Completed on {new Date(checkpoint.actualDate).toLocaleDateString()}</span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,7 +80,8 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                     id="checkDate"
                     type="date"
                     value={formData.actualDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, actualDate: e.target.value }))}
+                    onChange={(e) => !isViewMode && setFormData(prev => ({ ...prev, actualDate: e.target.value }))}
+                    disabled={isViewMode}
                   />
                 </div>
                 <div>
@@ -83,6 +92,7 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                     step="0.1"
                     value={formData.weight || ''}
                     onChange={(e) => handleWeightChange(Number(e.target.value))}
+                    disabled={isViewMode}
                   />
                 </div>
               </div>
@@ -121,10 +131,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                   <Input
                     id="vaccineName"
                     value={formData.vaccine?.name || ''}
-                    onChange={(e) => setFormData(prev => ({
+                    onChange={(e) => !isViewMode && setFormData(prev => ({
                       ...prev,
                       vaccine: { ...prev.vaccine, name: e.target.value, batch: prev.vaccine?.batch || '', dose: prev.vaccine?.dose || '' }
                     }))}
+                    disabled={isViewMode}
                   />
                 </div>
                 <div>
@@ -132,10 +143,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                   <Input
                     id="vaccineBatch"
                     value={formData.vaccine?.batch || ''}
-                    onChange={(e) => setFormData(prev => ({
+                    onChange={(e) => !isViewMode && setFormData(prev => ({
                       ...prev,
                       vaccine: { ...prev.vaccine, batch: e.target.value, name: prev.vaccine?.name || '', dose: prev.vaccine?.dose || '' }
                     }))}
+                    disabled={isViewMode}
                   />
                 </div>
                 <div>
@@ -143,10 +155,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                   <Input
                     id="vaccineDose"
                     value={formData.vaccine?.dose || ''}
-                    onChange={(e) => setFormData(prev => ({
+                    onChange={(e) => !isViewMode && setFormData(prev => ({
                       ...prev,
                       vaccine: { ...prev.vaccine, dose: e.target.value, name: prev.vaccine?.name || '', batch: prev.vaccine?.batch || '' }
                     }))}
+                    disabled={isViewMode}
                   />
                 </div>
               </div>
@@ -168,10 +181,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                   <Input
                     id="dewormerName"
                     value={formData.dewormer?.name || ''}
-                    onChange={(e) => setFormData(prev => ({
+                    onChange={(e) => !isViewMode && setFormData(prev => ({
                       ...prev,
                       dewormer: { name: e.target.value, dose: prev.dewormer?.dose || '' }
                     }))}
+                    disabled={isViewMode}
                   />
                 </div>
                 <div>
@@ -179,10 +193,11 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                   <Input
                     id="dewormerDose"
                     value={formData.dewormer?.dose || ''}
-                    onChange={(e) => setFormData(prev => ({
+                    onChange={(e) => !isViewMode && setFormData(prev => ({
                       ...prev,
                       dewormer: { dose: e.target.value, name: prev.dewormer?.name || '' }
                     }))}
+                    disabled={isViewMode}
                   />
                 </div>
               </div>
@@ -206,6 +221,7 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                       id={`medicine${index}Name`}
                       value={formData.medicines?.[index]?.name || ''}
                       onChange={(e) => {
+                        if (isViewMode) return;
                         const newMedicines = [...(formData.medicines || [])];
                         newMedicines[index] = { 
                           name: e.target.value, 
@@ -213,6 +229,7 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                         };
                         setFormData(prev => ({ ...prev, medicines: newMedicines }));
                       }}
+                      disabled={isViewMode}
                     />
                   </div>
                   <div>
@@ -221,6 +238,7 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                       id={`medicine${index}Dose`}
                       value={formData.medicines?.[index]?.dose || ''}
                       onChange={(e) => {
+                        if (isViewMode) return;
                         const newMedicines = [...(formData.medicines || [])];
                         newMedicines[index] = { 
                           dose: e.target.value, 
@@ -228,6 +246,7 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
                         };
                         setFormData(prev => ({ ...prev, medicines: newMedicines }));
                       }}
+                      disabled={isViewMode}
                     />
                   </div>
                 </div>
@@ -247,18 +266,23 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
               <Textarea
                 placeholder="Additional observations or notes..."
                 value={formData.notes || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) => !isViewMode && setFormData(prev => ({ ...prev, notes: e.target.value }))}
                 rows={3}
+                disabled={isViewMode}
               />
             </CardContent>
           </Card>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!formData.weight}>
-            Save Checkpoint
+          <Button variant="outline" onClick={onCancel}>
+            {isViewMode ? 'Close' : 'Cancel'}
           </Button>
+          {!isViewMode && (
+            <Button onClick={handleSave} disabled={!formData.weight}>
+              Save Checkpoint
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
