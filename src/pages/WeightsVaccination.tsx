@@ -4,15 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { AnimalCard } from "@/components/AnimalCard";
-import { Search, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
+import { Search, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const WeightsVaccination = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
   // Mock data for animals needing attention
@@ -38,7 +40,7 @@ const WeightsVaccination = () => {
       purchaser: "Farm Manager",
       lastWeightCheck: "2024-01-20",
       lastVaccination: "2024-01-10",
-      dueStatus: "overdue" // overdue, due-today, due-tomorrow
+      dueStatus: "overdue"
     },
     { 
       tag: "TAG-002", 
@@ -87,19 +89,22 @@ const WeightsVaccination = () => {
     }
   ]);
 
-  const filteredAnimals = animals.filter(animal =>
-    animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    animal.srNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (animal.doctor && animal.doctor.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
   const getStatusCounts = () => {
     const overdue = animals.filter(a => a.dueStatus === "overdue").length;
     const dueToday = animals.filter(a => a.dueStatus === "due-today").length;
     const dueTomorrow = animals.filter(a => a.dueStatus === "due-tomorrow").length;
     return { overdue, dueToday, dueTomorrow };
+  };
+
+  const getFilteredAnimals = (status: string) => {
+    return animals.filter(animal => 
+      animal.dueStatus === status &&
+      (animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       animal.srNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+       (animal.doctor && animal.doctor.toLowerCase().includes(searchTerm.toLowerCase())))
+    );
   };
 
   const handleWeightUpdate = (tag: string, newWeight: number) => {
@@ -115,7 +120,6 @@ const WeightsVaccination = () => {
       title: "Data Entry",
       description: "Opening comprehensive weights & vaccination entry form..."
     });
-    // This would open a comprehensive form for entering weights and vaccination data
   };
 
   const { overdue, dueToday, dueTomorrow } = getStatusCounts();
@@ -140,134 +144,156 @@ const WeightsVaccination = () => {
               </Button>
             </div>
 
-            {/* Status Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium opacity-90 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    Overdue
+            {/* Tabs Section */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger 
+                  value="overdue" 
+                  className="data-[state=active]:bg-red-100 data-[state=active]:text-red-800"
+                >
+                  Overdue ({overdue})
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="due-today"
+                  className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800"
+                >
+                  Due Today ({dueToday})
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="due-tomorrow"
+                  className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800"
+                >
+                  Due Tomorrow ({dueTomorrow})
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Search Section */}
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Search Animals
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{overdue}</div>
-                  <p className="text-xs opacity-75 mt-1">Require immediate attention</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-amber-500 to-amber-600 text-white">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium opacity-90 flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Due Today
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{dueToday}</div>
-                  <p className="text-xs opacity-75 mt-1">Scheduled for today</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium opacity-90 flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Due Tomorrow
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{dueTomorrow}</div>
-                  <p className="text-xs opacity-75 mt-1">Approaching deadline</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Search and Filter Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="h-5 w-5" />
-                  Search Animals
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Search by tag, Sr. No., breed, investor, or doctor..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Badge variant="secondary">Total: {animals.length}</Badge>
-                  <Badge variant="destructive">Overdue: {overdue}</Badge>
-                  <Badge className="bg-amber-100 text-amber-800">Due Today: {dueToday}</Badge>
-                  <Badge variant="outline">Due Tomorrow: {dueTomorrow}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Animals Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAnimals.map((animal) => (
-                <div key={animal.tag} className="relative">
-                  {/* Status indicator */}
-                  <div className="absolute top-2 right-2 z-10">
-                    {animal.dueStatus === "overdue" && (
-                      <Badge variant="destructive" className="text-xs">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        Overdue
-                      </Badge>
-                    )}
-                    {animal.dueStatus === "due-today" && (
-                      <Badge className="bg-amber-100 text-amber-800 text-xs">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Due Today
-                      </Badge>
-                    )}
-                    {animal.dueStatus === "due-tomorrow" && (
-                      <Badge variant="outline" className="text-xs">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Due Tomorrow
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <AnimalCard
-                    tag={animal.tag}
-                    srNo={animal.srNo}
-                    breed={animal.breed}
-                    coatColor={animal.coatColor}
-                    age={animal.age}
-                    weight={animal.weight}
-                    arrivalWeight={animal.arrivalWeight}
-                    adg={animal.adg}
-                    status={animal.status}
-                    farm={animal.farm}
-                    pen={animal.pen}
-                    investor={animal.investor}
-                    doctor={animal.doctor}
-                    purchaseDate={animal.purchaseDate}
-                    price={animal.price}
-                    ratePerKg={animal.ratePerKg}
-                    mandi={animal.mandi}
-                    purchaser={animal.purchaser}
-                    onWeightUpdate={handleWeightUpdate}
+                  <Input
+                    placeholder="Search by tag, Sr. No., breed, investor, or doctor..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full"
                   />
-                </div>
-              ))}
-            </div>
-
-            {filteredAnimals.length === 0 && (
-              <Card>
-                <CardContent className="text-center py-8">
-                  <p className="text-gray-500">No animals found matching your search criteria.</p>
                 </CardContent>
               </Card>
-            )}
+
+              {/* Tab Content */}
+              <TabsContent value="overdue" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getFilteredAnimals("overdue").map((animal) => (
+                    <AnimalCard
+                      key={animal.tag}
+                      tag={animal.tag}
+                      srNo={animal.srNo}
+                      breed={animal.breed}
+                      coatColor={animal.coatColor}
+                      age={animal.age}
+                      weight={animal.weight}
+                      arrivalWeight={animal.arrivalWeight}
+                      adg={animal.adg}
+                      status={animal.status}
+                      farm={animal.farm}
+                      pen={animal.pen}
+                      investor={animal.investor}
+                      doctor={animal.doctor}
+                      purchaseDate={animal.purchaseDate}
+                      price={animal.price}
+                      ratePerKg={animal.ratePerKg}
+                      mandi={animal.mandi}
+                      purchaser={animal.purchaser}
+                      onWeightUpdate={handleWeightUpdate}
+                    />
+                  ))}
+                </div>
+                {getFilteredAnimals("overdue").length === 0 && (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <p className="text-gray-500">No overdue animals found.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="due-today" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getFilteredAnimals("due-today").map((animal) => (
+                    <AnimalCard
+                      key={animal.tag}
+                      tag={animal.tag}
+                      srNo={animal.srNo}
+                      breed={animal.breed}
+                      coatColor={animal.coatColor}
+                      age={animal.age}
+                      weight={animal.weight}
+                      arrivalWeight={animal.arrivalWeight}
+                      adg={animal.adg}
+                      status={animal.status}
+                      farm={animal.farm}
+                      pen={animal.pen}
+                      investor={animal.investor}
+                      doctor={animal.doctor}
+                      purchaseDate={animal.purchaseDate}
+                      price={animal.price}
+                      ratePerKg={animal.ratePerKg}
+                      mandi={animal.mandi}
+                      purchaser={animal.purchaser}
+                      onWeightUpdate={handleWeightUpdate}
+                    />
+                  ))}
+                </div>
+                {getFilteredAnimals("due-today").length === 0 && (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <p className="text-gray-500">No animals due today.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="due-tomorrow" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getFilteredAnimals("due-tomorrow").map((animal) => (
+                    <AnimalCard
+                      key={animal.tag}
+                      tag={animal.tag}
+                      srNo={animal.srNo}
+                      breed={animal.breed}
+                      coatColor={animal.coatColor}
+                      age={animal.age}
+                      weight={animal.weight}
+                      arrivalWeight={animal.arrivalWeight}
+                      adg={animal.adg}
+                      status={animal.status}
+                      farm={animal.farm}
+                      pen={animal.pen}
+                      investor={animal.investor}
+                      doctor={animal.doctor}
+                      purchaseDate={animal.purchaseDate}
+                      price={animal.price}
+                      ratePerKg={animal.ratePerKg}
+                      mandi={animal.mandi}
+                      purchaser={animal.purchaser}
+                      onWeightUpdate={handleWeightUpdate}
+                    />
+                  ))}
+                </div>
+                {getFilteredAnimals("due-tomorrow").length === 0 && (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <p className="text-gray-500">No animals due tomorrow.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>

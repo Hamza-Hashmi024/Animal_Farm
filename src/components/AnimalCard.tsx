@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -100,12 +99,6 @@ export function AnimalCard({
               <Badge className={getStatusColor(status)}>
                 {status}
               </Badge>
-              {hasHealthAlerts && (
-                <Badge variant="destructive" className="text-xs">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  {overdueCheckpoints.length > 0 ? 'Overdue' : 'Due'}
-                </Badge>
-              )}
             </div>
             <Button variant="ghost" size="sm">
               <MoreHorizontal className="h-4 w-4" />
@@ -197,7 +190,6 @@ export function AnimalCard({
             )}
           </div>
 
-          {/* Health Status */}
           {hasHealthAlerts && (
             <div className="pt-2 border-t border-gray-100">
               <div className="flex items-center text-sm text-red-600">
@@ -223,7 +215,7 @@ export function AnimalCard({
               onClick={() => setShowHealthDialog(true)}
             >
               <Stethoscope className="h-4 w-4 mr-1" />
-              Health Check
+              Enter Data
             </Button>
           </div>
         </CardContent>
