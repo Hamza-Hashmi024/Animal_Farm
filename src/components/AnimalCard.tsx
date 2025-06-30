@@ -150,12 +150,12 @@ export function AnimalCard({
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <div>
                 <p className="text-sm font-medium text-gray-500">Purchase Price</p>
-                <p className="text-sm font-bold">₹{price.toLocaleString()}</p>
+                <p className="text-sm font-bold">PKR {price.toLocaleString()}</p>
               </div>
               {ratePerKg && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Rate/kg</p>
-                  <p className="text-sm font-bold">₹{ratePerKg}</p>
+                  <p className="text-sm font-bold">PKR {ratePerKg}</p>
                 </div>
               )}
             </div>
