@@ -1,4 +1,3 @@
-
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home, 
@@ -9,7 +8,8 @@ import {
   TrendingUp,
   Users,
   Scale,
-  UserPlus
+  UserPlus,
+  Beef
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +32,7 @@ const navigation = [
   { name: "Health Monitoring", href: "/health", icon: Calendar },
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
   { name: "Performance", href: "/performance", icon: TrendingUp },
+  { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
