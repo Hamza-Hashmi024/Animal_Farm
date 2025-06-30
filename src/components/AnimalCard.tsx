@@ -87,19 +87,19 @@ export function AnimalCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div>
-                <h3 className="font-semibold text-base">{tag}</h3>
+                <h3 className="font-semibold text-sm">{tag}</h3>
                 <p className="text-xs text-gray-500">Sr. No: {srNo}</p>
               </div>
-              <Badge className={getStatusColor(status)} style={{ fontSize: '10px' }}>
+              <Badge className={getStatusColor(status)} style={{ fontSize: '9px' }}>
                 {status}
               </Badge>
             </div>
-            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+            <Button variant="ghost" size="sm" className="h-5 w-5 p-0">
               <MoreHorizontal className="h-3 w-3" />
             </Button>
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-gray-700">{breed}</p>
+            <p className="text-xs font-medium text-gray-700">{breed}</p>
             {coatColor && <p className="text-xs text-gray-500">{coatColor}</p>}
             {age && <p className="text-xs text-gray-500">{age} months old</p>}
           </div>
@@ -110,7 +110,7 @@ export function AnimalCard({
             <div>
               <p className="text-xs font-medium text-gray-500">Current Weight</p>
               <div className="flex items-center space-x-1">
-                <p className="text-lg font-bold">{weight} kg</p>
+                <p className="text-sm font-bold">{weight} kg</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -128,7 +128,7 @@ export function AnimalCard({
             <div>
               <p className="text-xs font-medium text-gray-500">ADG</p>
               <div className="flex items-center space-x-1">
-                <p className="text-lg font-bold">{adg}</p>
+                <p className="text-sm font-bold">{adg}</p>
                 {isGoodADG ? (
                   <TrendingUp className="h-3 w-3 text-green-500" />
                 ) : (
@@ -139,7 +139,7 @@ export function AnimalCard({
           </div>
           
           <div className="pt-2 border-t border-gray-100">
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               <span className="font-medium">{farm}</span> • {pen}
             </p>
           </div>
@@ -159,13 +159,13 @@ export function AnimalCard({
           )}
           
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm" className="flex-1 text-xs h-7">
+            <Button variant="outline" size="sm" className="flex-1 text-xs h-6">
               View Details
             </Button>
             <Button 
-              variant="outline" 
+              variant="default" 
               size="sm" 
-              className="flex-1 text-xs h-7"
+              className="flex-1 text-xs h-6 bg-green-600 hover:bg-green-700 text-white"
               onClick={() => setShowHealthDialog(true)}
             >
               Enter Data

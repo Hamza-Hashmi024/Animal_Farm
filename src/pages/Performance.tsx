@@ -58,24 +58,24 @@ const Performance = () => {
         <main className="flex-1 overflow-hidden">
           <DashboardHeader />
           
-          <div className="p-6 space-y-3">
+          <div className="p-6 space-y-2">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Weight Performance</h1>
               <p className="text-gray-600 mt-1">Monitor livestock weight performance and ADG criteria</p>
             </div>
 
-            {/* Filters Section - Ultra compact */}
+            {/* Filters Section - Even more compact */}
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Filters</CardTitle>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-sm">Filters</CardTitle>
                 <CardDescription className="text-xs">Filter animals by farm, pen, and breed</CardDescription>
               </CardHeader>
-              <CardContent className="pb-3">
+              <CardContent className="pb-2">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <div className="space-y-1">
                     <label className="text-xs font-medium">Farm</label>
                     <Select value={selectedFarm} onValueChange={setSelectedFarm}>
-                      <SelectTrigger className="h-8 text-sm">
+                      <SelectTrigger className="h-7 text-xs">
                         <SelectValue placeholder="Select farm" />
                       </SelectTrigger>
                       <SelectContent>
@@ -90,7 +90,7 @@ const Performance = () => {
                   <div className="space-y-1">
                     <label className="text-xs font-medium">Pen</label>
                     <Select value={selectedPen} onValueChange={setSelectedPen}>
-                      <SelectTrigger className="h-8 text-sm">
+                      <SelectTrigger className="h-7 text-xs">
                         <SelectValue placeholder="Select pen" />
                       </SelectTrigger>
                       <SelectContent>
@@ -105,7 +105,7 @@ const Performance = () => {
                   <div className="space-y-1">
                     <label className="text-xs font-medium">Breed</label>
                     <Select value={selectedBreed} onValueChange={setSelectedBreed}>
-                      <SelectTrigger className="h-8 text-sm">
+                      <SelectTrigger className="h-7 text-xs">
                         <SelectValue placeholder="Select breed" />
                       </SelectTrigger>
                       <SelectContent>
@@ -123,15 +123,15 @@ const Performance = () => {
               </CardContent>
             </Card>
 
-            {/* Average Cards - Ultra compact */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Average Cards - Even more compact */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
                   <CardTitle className="text-xs font-medium">Average Weight</CardTitle>
                   <Scale className="h-3 w-3 text-muted-foreground" />
                 </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="text-xl font-bold">{averageWeight} kg</div>
+                <CardContent className="pb-1">
+                  <div className="text-lg font-bold">{averageWeight} kg</div>
                   <p className="text-xs text-muted-foreground">
                     Based on {filteredAnimals.length} animals
                   </p>
@@ -139,12 +139,12 @@ const Performance = () => {
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
                   <CardTitle className="text-xs font-medium">Average Daily Gain</CardTitle>
                   <TrendingUp className="h-3 w-3 text-muted-foreground" />
                 </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="text-xl font-bold">{averageADG} kg/day</div>
+                <CardContent className="pb-1">
+                  <div className="text-lg font-bold">{averageADG} kg/day</div>
                   <p className="text-xs text-muted-foreground">
                     Based on {filteredAnimals.length} animals
                   </p>
