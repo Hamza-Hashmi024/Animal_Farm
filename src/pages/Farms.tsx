@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ const Farms = () => {
     {
       id: "1",
       farmNumber: "Farm A",
-      address: "123 Ranch Road, Rural County, TX 75001",
+      address: "Gulberg III, Lahore, Punjab, Pakistan",
       numberOfPens: 12,
       area: 50.5,
       startDate: "2024-01-15",
@@ -32,7 +33,7 @@ const Farms = () => {
     {
       id: "2", 
       farmNumber: "Farm B",
-      address: "456 Cattle Drive, Livestock City, TX 75002",
+      address: "DHA Phase 5, Karachi, Sindh, Pakistan",
       numberOfPens: 18,
       area: 75.2,
       startDate: "2024-02-20",
@@ -41,7 +42,7 @@ const Farms = () => {
     {
       id: "3",
       farmNumber: "Farm C", 
-      address: "789 Pasture Lane, Farm Valley, TX 75003",
+      address: "F-6 Sector, Islamabad, Pakistan",
       numberOfPens: 8,
       area: 32.8,
       startDate: "2024-03-10",
