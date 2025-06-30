@@ -12,7 +12,8 @@ import {
   Beef,
   MapPin,
   Search,
-  Shield
+  Shield,
+  BarChart3
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,6 +37,7 @@ const navigation = [
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
   { name: "Quarantine", href: "/quarantine", icon: Shield },
   { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
+  { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Investors", href: "/investors", icon: Users },
   { name: "Farms", href: "/farms", icon: MapPin },
 ];
