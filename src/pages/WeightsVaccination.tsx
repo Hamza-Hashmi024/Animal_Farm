@@ -343,14 +343,6 @@ const WeightsVaccination = () => {
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     return animals.filter(animal => {
-      const matchesSearch = animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        animal.srNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (animal.doctor && animal.doctor.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      if (!matchesSearch) return false;
-      
       switch (status) {
         case 'overdue':
           return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < today);
@@ -426,19 +418,9 @@ const WeightsVaccination = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Quick Search - Simplified */}
-              <div className="mt-4 mb-6">
-                <Input
-                  placeholder="Quick search by tag, breed, investor..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-md"
-                />
-              </div>
-
               {/* Tab Content */}
               <TabsContent value="overdue" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {getFilteredAnimals("overdue").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
@@ -458,7 +440,7 @@ const WeightsVaccination = () => {
               </TabsContent>
 
               <TabsContent value="due-today" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {getFilteredAnimals("due-today").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
@@ -478,7 +460,7 @@ const WeightsVaccination = () => {
               </TabsContent>
 
               <TabsContent value="due-tomorrow" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {getFilteredAnimals("due-tomorrow").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
