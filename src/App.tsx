@@ -12,7 +12,8 @@ import Farms from "./pages/Farms";
 import Incidents from "./pages/Incidents";
 import Performance from "./pages/Performance";
 import SlaughterRecording from "./pages/SlaughterRecording";
-import AnimalLocation from "./pages/AnimalLocation";
+import FindAnimals from "./pages/FindAnimals";
+import Quarantine from "./pages/Quarantine";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,12 +28,13 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/register-animal" element={<RegisterAnimal />} />
           <Route path="/weights-vaccination" element={<WeightsVaccination />} />
+          <Route path="/performance" element={<Performance />} />
+          <Route path="/find-animals" element={<FindAnimals />} />
+          <Route path="/incidents" element={<Incidents />} />
+          <Route path="/quarantine" element={<Quarantine />} />
+          <Route path="/slaughter-recording" element={<SlaughterRecording />} />
           <Route path="/investors" element={<Investors />} />
           <Route path="/farms" element={<Farms />} />
-          <Route path="/incidents" element={<Incidents />} />
-          <Route path="/performance" element={<Performance />} />
-          <Route path="/animal-location" element={<AnimalLocation />} />
-          <Route path="/slaughter-recording" element={<SlaughterRecording />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

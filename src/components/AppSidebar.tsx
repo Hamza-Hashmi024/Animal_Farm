@@ -11,7 +11,8 @@ import {
   UserPlus,
   Beef,
   MapPin,
-  Search
+  Search,
+  Shield
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,13 +30,14 @@ import {
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Register Animal", href: "/register-animal", icon: UserPlus },
-  { name: "Weights & Vaccination", href: "/weights-vaccination", icon: Scale },
-  { name: "Animal Location", href: "/animal-location", icon: Search },
+  { name: "Weight & Vaccination", href: "/weights-vaccination", icon: Scale },
+  { name: "Weight Performance", href: "/performance", icon: TrendingUp },
+  { name: "Find Animals", href: "/find-animals", icon: Search },
+  { name: "Incidents", href: "/incidents", icon: AlertTriangle },
+  { name: "Quarantine", href: "/quarantine", icon: Shield },
+  { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
   { name: "Investors", href: "/investors", icon: Users },
   { name: "Farms", href: "/farms", icon: MapPin },
-  { name: "Incidents", href: "/incidents", icon: AlertTriangle },
-  { name: "Weight Performance", href: "/performance", icon: TrendingUp },
-  { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
 ];
 
 export function AppSidebar() {
