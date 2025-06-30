@@ -10,7 +10,8 @@ import {
   Scale,
   UserPlus,
   Beef,
-  MapPin
+  MapPin,
+  Search
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,6 +30,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Register Animal", href: "/register-animal", icon: UserPlus },
   { name: "Weights & Vaccination", href: "/weights-vaccination", icon: Scale },
+  { name: "Animal Location", href: "/animal-location", icon: Search },
   { name: "Investors", href: "/investors", icon: Users },
   { name: "Farms", href: "/farms", icon: MapPin },
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
