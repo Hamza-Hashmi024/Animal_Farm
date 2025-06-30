@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import { Calendar, Clock, AlertTriangle, CheckCircle, Eye, Plus } from "lucide-react";
 import { Checkpoint } from "@/types/checkpoint";
 import { HealthCheckpoint } from "./HealthCheckpoint";
 
@@ -47,8 +47,47 @@ export function ScheduledCheckpoints({ checkpoints, onCheckpointUpdate }: Schedu
       case 'due-today':
         return <Clock className="h-4 w-4 text-amber-500" />;
       default:
-        return <Calendar className="h-4 w-4 text-blue-500" />;
+        return <Calendar className="h-4 w-4 text-gray-400" />;
     }
+  };
+
+  const getActionButton = (checkpoint: Checkpoint, status: string) => {
+    if (status === 'upcoming') {
+      return (
+        <Button 
+          size="sm" 
+          variant="outline"
+          disabled
+          className="opacity-50"
+        >
+          Not Due Yet
+        </Button>
+      );
+    }
+
+    if (checkpoint.completed) {
+      return (
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={() => handleConductCheckpoint(checkpoint)}
+        >
+          <Eye className="h-4 w-4 mr-1" />
+          View
+        </Button>
+      );
+    }
+
+    return (
+      <Button 
+        size="sm" 
+        onClick={() => handleConductCheckpoint(checkpoint)}
+        variant={status === 'overdue' ? 'destructive' : 'default'}
+      >
+        <Plus className="h-4 w-4 mr-1" />
+        Enter
+      </Button>
+    );
   };
 
   const handleConductCheckpoint = (checkpoint: Checkpoint) => {
@@ -82,18 +121,26 @@ export function ScheduledCheckpoints({ checkpoints, onCheckpointUpdate }: Schedu
           <div className="space-y-3">
             {sortedCheckpoints.map((checkpoint) => {
               const status = getCheckpointStatus(checkpoint);
-              const canConduct = !checkpoint.completed;
               
               return (
-                <div key={checkpoint.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div 
+                  key={checkpoint.id} 
+                  className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                    status === 'upcoming' 
+                      ? 'bg-gray-50 opacity-75' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(status)}
                     <div>
                       <div className="flex items-center space-x-2">
-                        <p className="font-medium">{checkpoint.name}</p>
+                        <p className={`font-medium ${status === 'upcoming' ? 'text-gray-400' : ''}`}>
+                          {checkpoint.name}
+                        </p>
                         {getStatusBadge(status)}
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className={`text-sm ${status === 'upcoming' ? 'text-gray-400' : 'text-gray-600'}`}>
                         Day {checkpoint.day} • Scheduled: {new Date(checkpoint.scheduledDate).toLocaleDateString()}
                         {checkpoint.completed && checkpoint.actualDate && (
                           <span> • Completed: {new Date(checkpoint.actualDate).toLocaleDateString()}</span>
@@ -109,24 +156,7 @@ export function ScheduledCheckpoints({ checkpoints, onCheckpointUpdate }: Schedu
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    {canConduct && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleConductCheckpoint(checkpoint)}
-                        variant={status === 'overdue' ? 'destructive' : status === 'due-today' ? 'default' : 'outline'}
-                      >
-                        {status === 'overdue' ? 'Overdue' : status === 'due-today' ? 'Conduct Now' : 'Conduct'}
-                      </Button>
-                    )}
-                    {checkpoint.completed && (
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        onClick={() => handleConductCheckpoint(checkpoint)}
-                      >
-                        View/Edit
-                      </Button>
-                    )}
+                    {getActionButton(checkpoint, status)}
                   </div>
                 </div>
               );

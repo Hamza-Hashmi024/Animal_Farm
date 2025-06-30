@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,80 @@ const WeightsVaccination = () => {
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
-  // Mock data for animals needing attention - 3 animals per category with custom checkpoints
+  // Helper function to create full checkpoint schedule
+  const createCheckpointSchedule = (animalTag: string, arrivalDate: string, overdueDay?: number, dueTodayDay?: number, dueTomorrowDay?: number) => {
+    const arrival = new Date(arrivalDate);
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    const checkpoints: Checkpoint[] = [
+      {
+        id: `${animalTag}-day-0`,
+        animalTag,
+        day: 0,
+        name: "Arrival",
+        scheduledDate: arrivalDate,
+        completed: true,
+        actualDate: arrivalDate,
+        weight: 400,
+        notes: "Animal arrived healthy"
+      },
+      {
+        id: `${animalTag}-day-3`,
+        animalTag,
+        day: 3,
+        name: "Day 3 Check",
+        scheduledDate: new Date(arrival.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        completed: overdueDay === 3 ? false : dueTodayDay === 3 ? false : dueTomorrowDay === 3 ? false : true,
+        actualDate: overdueDay === 3 || dueTodayDay === 3 || dueTomorrowDay === 3 ? undefined : new Date(arrival.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        weight: overdueDay === 3 || dueTodayDay === 3 || dueTomorrowDay === 3 ? undefined : 410
+      },
+      {
+        id: `${animalTag}-day-7`,
+        animalTag,
+        day: 7,
+        name: "Day 7 Check",
+        scheduledDate: new Date(arrival.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        completed: overdueDay === 7 ? false : dueTodayDay === 7 ? false : dueTomorrowDay === 7 ? false : true,
+        actualDate: overdueDay === 7 || dueTodayDay === 7 || dueTomorrowDay === 7 ? undefined : new Date(arrival.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        weight: overdueDay === 7 || dueTodayDay === 7 || dueTomorrowDay === 7 ? undefined : 420
+      },
+      {
+        id: `${animalTag}-day-21`,
+        animalTag,
+        day: 21,
+        name: "Day 21 Check",
+        scheduledDate: overdueDay === 21 ? "2024-06-25" : dueTodayDay === 21 ? today : dueTomorrowDay === 21 ? tomorrow : new Date(arrival.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        completed: overdueDay === 21 || dueTodayDay === 21 || dueTomorrowDay === 21 ? false : new Date(arrival.getTime() + 21 * 24 * 60 * 60 * 1000) < new Date(),
+        actualDate: overdueDay === 21 || dueTodayDay === 21 || dueTomorrowDay === 21 ? undefined : new Date(arrival.getTime() + 21 * 24 * 60 * 60 * 1000) < new Date() ? new Date(arrival.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+        weight: overdueDay === 21 || dueTodayDay === 21 || dueTomorrowDay === 21 ? undefined : new Date(arrival.getTime() + 21 * 24 * 60 * 60 * 1000) < new Date() ? 450 : undefined
+      },
+      {
+        id: `${animalTag}-day-50`,
+        animalTag,
+        day: 50,
+        name: "Day 50 Check",
+        scheduledDate: overdueDay === 50 ? "2024-06-27" : dueTodayDay === 50 ? today : dueTomorrowDay === 50 ? tomorrow : new Date(arrival.getTime() + 50 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        completed: overdueDay === 50 || dueTodayDay === 50 || dueTomorrowDay === 50 ? false : new Date(arrival.getTime() + 50 * 24 * 60 * 60 * 1000) < new Date(),
+        actualDate: overdueDay === 50 || dueTodayDay === 50 || dueTomorrowDay === 50 ? undefined : new Date(arrival.getTime() + 50 * 24 * 60 * 60 * 1000) < new Date() ? new Date(arrival.getTime() + 50 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+        weight: overdueDay === 50 || dueTodayDay === 50 || dueTomorrowDay === 50 ? undefined : new Date(arrival.getTime() + 50 * 24 * 60 * 60 * 1000) < new Date() ? 480 : undefined
+      },
+      {
+        id: `${animalTag}-day-75`,
+        animalTag,
+        day: 75,
+        name: "Day 75 Check",
+        scheduledDate: overdueDay === 75 ? "2024-06-28" : dueTodayDay === 75 ? today : dueTomorrowDay === 75 ? tomorrow : new Date(arrival.getTime() + 75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        completed: overdueDay === 75 || dueTodayDay === 75 || dueTomorrowDay === 75 ? false : new Date(arrival.getTime() + 75 * 24 * 60 * 60 * 1000) < new Date(),
+        actualDate: overdueDay === 75 || dueTodayDay === 75 || dueTomorrowDay === 75 ? undefined : new Date(arrival.getTime() + 75 * 24 * 60 * 60 * 1000) < new Date() ? new Date(arrival.getTime() + 75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+        weight: overdueDay === 75 || dueTodayDay === 75 || dueTomorrowDay === 75 ? undefined : new Date(arrival.getTime() + 75 * 24 * 60 * 60 * 1000) < new Date() ? 520 : undefined
+      }
+    ];
+
+    return checkpoints;
+  };
+
+  // Mock data for animals with complete checkpoint schedules
   const [animals, setAnimals] = useState([
     // Overdue animals (3) - each with 1 overdue checkpoint
     { 
@@ -40,19 +114,7 @@ const WeightsVaccination = () => {
       mandi: "Central Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-01-15",
-      lastWeightCheck: "2024-06-20",
-      lastVaccination: "2024-06-10",
-      dueStatus: "overdue",
-      checkpoints: [
-        {
-          id: "TAG-001-day-21",
-          animalTag: "TAG-001",
-          day: 21,
-          name: "Day 21 Check",
-          scheduledDate: "2024-06-25",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-001", "2024-01-15", 21) // Day 21 is overdue
     },
     { 
       tag: "TAG-004", 
@@ -74,19 +136,7 @@ const WeightsVaccination = () => {
       mandi: "Local Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-02-20",
-      lastWeightCheck: "2024-06-22",
-      lastVaccination: "2024-06-12",
-      dueStatus: "overdue",
-      checkpoints: [
-        {
-          id: "TAG-004-day-50",
-          animalTag: "TAG-004",
-          day: 50,
-          name: "Day 50 Check",
-          scheduledDate: "2024-06-27",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-004", "2024-02-20", 50) // Day 50 is overdue
     },
     { 
       tag: "TAG-007", 
@@ -108,19 +158,7 @@ const WeightsVaccination = () => {
       mandi: "Premium Market",
       purchaser: "John Doe",
       arrivalDate: "2024-01-10",
-      lastWeightCheck: "2024-06-18",
-      lastVaccination: "2024-06-08",
-      dueStatus: "overdue",
-      checkpoints: [
-        {
-          id: "TAG-007-day-75",
-          animalTag: "TAG-007",
-          day: 75,
-          name: "Day 75 Check",
-          scheduledDate: "2024-06-28",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-007", "2024-01-10", 75) // Day 75 is overdue
     },
     // Due today animals (3) - each with 1 checkpoint due today
     { 
@@ -143,19 +181,7 @@ const WeightsVaccination = () => {
       mandi: "Livestock Market",
       purchaser: "John Doe",
       arrivalDate: "2024-02-10",
-      lastWeightCheck: "2024-06-29",
-      lastVaccination: "2024-06-25",
-      dueStatus: "due-today",
-      checkpoints: [
-        {
-          id: "TAG-002-day-21",
-          animalTag: "TAG-002",
-          day: 21,
-          name: "Day 21 Check",
-          scheduledDate: "2024-06-30",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-002", "2024-02-10", undefined, 21) // Day 21 is due today
     },
     { 
       tag: "TAG-005", 
@@ -177,19 +203,7 @@ const WeightsVaccination = () => {
       mandi: "Central Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-15",
-      lastWeightCheck: "2024-06-29",
-      lastVaccination: "2024-06-26",
-      dueStatus: "due-today",
-      checkpoints: [
-        {
-          id: "TAG-005-day-50",
-          animalTag: "TAG-005",
-          day: 50,
-          name: "Day 50 Check",
-          scheduledDate: "2024-06-30",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-005", "2024-03-15", undefined, 50) // Day 50 is due today
     },
     { 
       tag: "TAG-008", 
@@ -211,19 +225,7 @@ const WeightsVaccination = () => {
       mandi: "Regional Market",
       purchaser: "John Doe",
       arrivalDate: "2024-02-05",
-      lastWeightCheck: "2024-06-29",
-      lastVaccination: "2024-06-26",
-      dueStatus: "due-today",
-      checkpoints: [
-        {
-          id: "TAG-008-day-7",
-          animalTag: "TAG-008",
-          day: 7,
-          name: "Day 7 Check",
-          scheduledDate: "2024-06-30",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-008", "2024-02-05", undefined, 7) // Day 7 is due today
     },
     // Due tomorrow animals (3) - each with 1 checkpoint due tomorrow
     { 
@@ -245,19 +247,7 @@ const WeightsVaccination = () => {
       mandi: "Regional Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-05",
-      lastWeightCheck: "2024-06-28",
-      lastVaccination: "2024-06-20",
-      dueStatus: "due-tomorrow",
-      checkpoints: [
-        {
-          id: "TAG-003-day-21",
-          animalTag: "TAG-003",
-          day: 21,
-          name: "Day 21 Check",
-          scheduledDate: "2024-07-01",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-003", "2024-03-05", undefined, undefined, 21) // Day 21 is due tomorrow
     },
     { 
       tag: "TAG-006", 
@@ -279,19 +269,7 @@ const WeightsVaccination = () => {
       mandi: "Livestock Market",
       purchaser: "John Doe",
       arrivalDate: "2024-01-25",
-      lastWeightCheck: "2024-06-28",
-      lastVaccination: "2024-06-21",
-      dueStatus: "due-tomorrow",
-      checkpoints: [
-        {
-          id: "TAG-006-day-75",
-          animalTag: "TAG-006",
-          day: 75,
-          name: "Day 75 Check",
-          scheduledDate: "2024-07-01",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-006", "2024-01-25", undefined, undefined, 75) // Day 75 is due tomorrow
     },
     { 
       tag: "TAG-009", 
@@ -313,44 +291,74 @@ const WeightsVaccination = () => {
       mandi: "Local Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-20",
-      lastWeightCheck: "2024-06-28",
-      lastVaccination: "2024-06-22",
-      dueStatus: "due-tomorrow",
-      checkpoints: [
-        {
-          id: "TAG-009-day-50",
-          animalTag: "TAG-009",
-          day: 50,
-          name: "Day 50 Check",
-          scheduledDate: "2024-07-01",
-          completed: false
-        }
-      ] as Checkpoint[]
+      checkpoints: createCheckpointSchedule("TAG-009", "2024-03-20", undefined, undefined, 50) // Day 50 is due tomorrow
     }
   ]);
 
+  // Helper function to get status counts based on checkpoints
   const getStatusCounts = () => {
-    const overdue = animals.filter(a => a.dueStatus === "overdue").length;
-    const dueToday = animals.filter(a => a.dueStatus === "due-today").length;
-    const dueTomorrow = animals.filter(a => a.dueStatus === "due-tomorrow").length;
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    const overdue = animals.filter(animal => 
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < today)
+    ).length;
+    
+    const dueToday = animals.filter(animal => 
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === today)
+    ).length;
+    
+    const dueTomorrow = animals.filter(animal => 
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === tomorrow)
+    ).length;
+    
     return { overdue, dueToday, dueTomorrow };
   };
 
+  // Helper function to filter animals based on their checkpoint status
   const getFilteredAnimals = (status: string) => {
-    return animals.filter(animal => 
-      animal.dueStatus === status &&
-      (animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       animal.srNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-       (animal.doctor && animal.doctor.toLowerCase().includes(searchTerm.toLowerCase())))
-    );
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    return animals.filter(animal => {
+      const matchesSearch = animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        animal.srNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (animal.doctor && animal.doctor.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      if (!matchesSearch) return false;
+      
+      switch (status) {
+        case 'overdue':
+          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < today);
+        case 'due-today':
+          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === today);
+        case 'due-tomorrow':
+          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === tomorrow);
+        default:
+          return false;
+      }
+    });
   };
 
   const handleWeightUpdate = (tag: string, newWeight: number) => {
     setAnimals(prev => prev.map(animal => 
       animal.tag === tag 
-        ? { ...animal, weight: newWeight, lastWeightCheck: new Date().toISOString().split('T')[0] }
+        ? { ...animal, weight: newWeight }
+        : animal
+    ));
+  };
+
+  const handleCheckpointUpdate = (animalTag: string, updatedCheckpoint: Checkpoint) => {
+    setAnimals(prev => prev.map(animal => 
+      animal.tag === animalTag 
+        ? { 
+            ...animal, 
+            checkpoints: animal.checkpoints.map(cp => 
+              cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
+            )
+          }
         : animal
     ));
   };
@@ -431,27 +439,9 @@ const WeightsVaccination = () => {
                   {getFilteredAnimals("overdue").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
-                      tag={animal.tag}
-                      srNo={animal.srNo}
-                      breed={animal.breed}
-                      coatColor={animal.coatColor}
-                      age={animal.age}
-                      weight={animal.weight}
-                      arrivalWeight={animal.arrivalWeight}
-                      adg={animal.adg}
-                      status={animal.status}
-                      farm={animal.farm}
-                      pen={animal.pen}
-                      investor={animal.investor}
-                      doctor={animal.doctor}
-                      purchaseDate={animal.purchaseDate}
-                      price={animal.price}
-                      ratePerKg={animal.ratePerKg}
-                      mandi={animal.mandi}
-                      purchaser={animal.purchaser}
-                      arrivalDate={animal.arrivalDate}
+                      {...animal}
                       onWeightUpdate={handleWeightUpdate}
-                      checkpoints={animal.checkpoints}
+                      onCheckpointUpdate={handleCheckpointUpdate}
                     />
                   ))}
                 </div>
@@ -469,27 +459,9 @@ const WeightsVaccination = () => {
                   {getFilteredAnimals("due-today").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
-                      tag={animal.tag}
-                      srNo={animal.srNo}
-                      breed={animal.breed}
-                      coatColor={animal.coatColor}
-                      age={animal.age}
-                      weight={animal.weight}
-                      arrivalWeight={animal.arrivalWeight}
-                      adg={animal.adg}
-                      status={animal.status}
-                      farm={animal.farm}
-                      pen={animal.pen}
-                      investor={animal.investor}
-                      doctor={animal.doctor}
-                      purchaseDate={animal.purchaseDate}
-                      price={animal.price}
-                      ratePerKg={animal.ratePerKg}
-                      mandi={animal.mandi}
-                      purchaser={animal.purchaser}
-                      arrivalDate={animal.arrivalDate}
+                      {...animal}
                       onWeightUpdate={handleWeightUpdate}
-                      checkpoints={animal.checkpoints}
+                      onCheckpointUpdate={handleCheckpointUpdate}
                     />
                   ))}
                 </div>
@@ -507,27 +479,9 @@ const WeightsVaccination = () => {
                   {getFilteredAnimals("due-tomorrow").map((animal) => (
                     <AnimalCard
                       key={animal.tag}
-                      tag={animal.tag}
-                      srNo={animal.srNo}
-                      breed={animal.breed}
-                      coatColor={animal.coatColor}
-                      age={animal.age}
-                      weight={animal.weight}
-                      arrivalWeight={animal.arrivalWeight}
-                      adg={animal.adg}
-                      status={animal.status}
-                      farm={animal.farm}
-                      pen={animal.pen}
-                      investor={animal.investor}
-                      doctor={animal.doctor}
-                      purchaseDate={animal.purchaseDate}
-                      price={animal.price}
-                      ratePerKg={animal.ratePerKg}
-                      mandi={animal.mandi}
-                      purchaser={animal.purchaser}
-                      arrivalDate={animal.arrivalDate}
+                      {...animal}
                       onWeightUpdate={handleWeightUpdate}
-                      checkpoints={animal.checkpoints}
+                      onCheckpointUpdate={handleCheckpointUpdate}
                     />
                   ))}
                 </div>

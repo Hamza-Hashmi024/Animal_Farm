@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,7 @@ import { ScheduledCheckpoints } from "./ScheduledCheckpoints";
 import { WeightUpdateDialog } from "./WeightUpdateDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkpoint } from "@/types/checkpoint";
-import { generateCheckpointSchedule, getOverdueCheckpoints, getDueCheckpoints } from "@/utils/checkpointUtils";
+import { getOverdueCheckpoints, getDueCheckpoints } from "@/utils/checkpointUtils";
 
 interface AnimalCardProps {
   tag: string;
@@ -30,7 +31,8 @@ interface AnimalCardProps {
   purchaser?: string;
   arrivalDate?: string;
   onWeightUpdate?: (tag: string, newWeight: number) => void;
-  checkpoints?: Checkpoint[];
+  onCheckpointUpdate?: (animalTag: string, checkpoint: Checkpoint) => void;
+  checkpoints: Checkpoint[];
 }
 
 export function AnimalCard({ 
@@ -54,15 +56,11 @@ export function AnimalCard({
   purchaser,
   arrivalDate,
   onWeightUpdate,
-  checkpoints: providedCheckpoints
+  onCheckpointUpdate,
+  checkpoints
 }: AnimalCardProps) {
   const [showHealthDialog, setShowHealthDialog] = useState(false);
   const [showWeightDialog, setShowWeightDialog] = useState(false);
-  
-  // Use provided checkpoints if available, otherwise generate them
-  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(
-    providedCheckpoints || generateCheckpointSchedule(tag, arrivalDate || purchaseDate || '2024-06-01')
-  );
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -79,9 +77,9 @@ export function AnimalCard({
   const hasHealthAlerts = overdueCheckpoints.length > 0 || dueCheckpoints.length > 0;
 
   const handleCheckpointUpdate = (updatedCheckpoint: Checkpoint) => {
-    setCheckpoints(prev => prev.map(cp => 
-      cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
-    ));
+    if (onCheckpointUpdate) {
+      onCheckpointUpdate(tag, updatedCheckpoint);
+    }
   };
 
   const handleWeightUpdate = (newWeight: number) => {
