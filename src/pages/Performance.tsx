@@ -58,24 +58,24 @@ const Performance = () => {
         <main className="flex-1 overflow-hidden">
           <DashboardHeader />
           
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Weight Performance</h1>
               <p className="text-gray-600 mt-1">Monitor livestock weight performance and ADG criteria</p>
             </div>
 
-            {/* Filters Section */}
+            {/* Filters Section - Made more compact */}
             <Card>
-              <CardHeader>
-                <CardTitle>Filters</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Filters</CardTitle>
                 <CardDescription>Filter animals by farm, pen, and breed</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
+              <CardContent className="pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
                     <label className="text-sm font-medium">Farm</label>
                     <Select value={selectedFarm} onValueChange={setSelectedFarm}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="Select farm" />
                       </SelectTrigger>
                       <SelectContent>
@@ -87,10 +87,10 @@ const Performance = () => {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label className="text-sm font-medium">Pen</label>
                     <Select value={selectedPen} onValueChange={setSelectedPen}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="Select pen" />
                       </SelectTrigger>
                       <SelectContent>
@@ -102,10 +102,10 @@ const Performance = () => {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label className="text-sm font-medium">Breed</label>
                     <Select value={selectedBreed} onValueChange={setSelectedBreed}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="Select breed" />
                       </SelectTrigger>
                       <SelectContent>
@@ -123,14 +123,14 @@ const Performance = () => {
               </CardContent>
             </Card>
 
-            {/* Average Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Average Cards - Made more compact */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Average Weight</CardTitle>
                   <Scale className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-3">
                   <div className="text-2xl font-bold">{averageWeight} kg</div>
                   <p className="text-xs text-muted-foreground">
                     Based on {filteredAnimals.length} animals
@@ -143,7 +143,7 @@ const Performance = () => {
                   <CardTitle className="text-sm font-medium">Average Daily Gain</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-3">
                   <div className="text-2xl font-bold">{averageADG} kg/day</div>
                   <p className="text-xs text-muted-foreground">
                     Based on {filteredAnimals.length} animals
