@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +5,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { RecentIncidents } from "@/components/RecentIncidents";
-import { AlertTriangle, Plus, FileText, Clock } from "lucide-react";
+import { ReportIncidentDialog } from "@/components/ReportIncidentDialog";
+import { AlertTriangle, FileText, Clock } from "lucide-react";
 
 const Incidents = () => {
   const recentIncidents = [
@@ -18,7 +18,7 @@ const Incidents = () => {
       pen: "Pen 5",
       description: "Minor leg injury observed during routine check",
       priority: "High",
-      date: "2024-06-29",
+      date: "2025-06-29",
       status: "Under Treatment"
     },
     {
@@ -29,7 +29,7 @@ const Incidents = () => {
       pen: "Pen 3",
       description: "Showing signs of respiratory distress",
       priority: "Medium",
-      date: "2024-06-28",
+      date: "2025-06-28",
       status: "Monitoring"
     },
     {
@@ -40,7 +40,7 @@ const Incidents = () => {
       pen: "Pen 1",
       description: "Aggressive behavior towards other animals",
       priority: "Medium",
-      date: "2024-06-27",
+      date: "2025-06-27",
       status: "Isolated"
     },
     {
@@ -51,7 +51,7 @@ const Incidents = () => {
       pen: "Quarantine",
       description: "Stress symptoms after transport from auction",
       priority: "Low",
-      date: "2024-06-26",
+      date: "2025-06-26",
       status: "Recovered"
     },
   ];
@@ -78,10 +78,7 @@ const Incidents = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Incident Management</h1>
                 <p className="text-gray-600 mt-1">Track and manage animal incidents and emergencies</p>
               </div>
-              <Button className="bg-red-600 hover:bg-red-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Report Incident
-              </Button>
+              <ReportIncidentDialog />
             </div>
 
             {/* Incident Statistics */}
