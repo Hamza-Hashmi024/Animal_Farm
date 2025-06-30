@@ -6,7 +6,8 @@ import {
   Calendar, 
   FileText, 
   AlertTriangle, 
-  TrendingUp 
+  TrendingUp,
+  Users
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,6 +25,7 @@ import {
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Animals", href: "/animals", icon: FileText },
+  { name: "Investors", href: "/investors", icon: Users },
   { name: "Health Monitoring", href: "/health", icon: Calendar },
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
   { name: "Performance", href: "/performance", icon: TrendingUp },

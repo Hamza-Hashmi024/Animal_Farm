@@ -13,19 +13,20 @@ import { Search, Filter, Plus } from "lucide-react";
 const Animals = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock data for animals
+  // Mock data for animals with investor assignments
   const animals = [
-    { tag: "TAG-001", breed: "Holstein", weight: 450, adg: 1.3, status: "Active", farm: "Farm A", pen: "Pen 3" },
-    { tag: "TAG-002", breed: "Angus", weight: 387, adg: 1.1, status: "Active", farm: "Farm B", pen: "Pen 1" },
+    { tag: "TAG-001", breed: "Holstein", weight: 450, adg: 1.3, status: "Active", farm: "Farm A", pen: "Pen 3", investor: "John Smith" },
+    { tag: "TAG-002", breed: "Angus", weight: 387, adg: 1.1, status: "Active", farm: "Farm B", pen: "Pen 1", investor: "Sarah Johnson" },
     { tag: "TAG-003", breed: "Hereford", weight: 298, adg: 0.9, status: "Quarantine", farm: "Farm A", pen: "Quarantine" },
-    { tag: "TAG-004", breed: "Charolais", weight: 523, adg: 1.4, status: "Active", farm: "Farm C", pen: "Pen 2" },
-    { tag: "TAG-005", breed: "Limousin", weight: 412, adg: 1.2, status: "Active", farm: "Farm B", pen: "Pen 4" },
-    { tag: "TAG-006", breed: "Simmental", weight: 335, adg: 1.0, status: "Active", farm: "Farm A", pen: "Pen 1" },
+    { tag: "TAG-004", breed: "Charolais", weight: 523, adg: 1.4, status: "Active", farm: "Farm C", pen: "Pen 2", investor: "Emily Davis" },
+    { tag: "TAG-005", breed: "Limousin", weight: 412, adg: 1.2, status: "Active", farm: "Farm B", pen: "Pen 4", investor: "Michael Chen" },
+    { tag: "TAG-006", breed: "Simmental", weight: 335, adg: 1.0, status: "Active", farm: "Farm A", pen: "Pen 1", investor: "John Smith" },
   ];
 
   const filteredAnimals = animals.filter(animal =>
     animal.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    animal.breed.toLowerCase().includes(searchTerm.toLowerCase())
+    animal.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (animal.investor && animal.investor.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -60,7 +61,7 @@ const Animals = () => {
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <Input
-                      placeholder="Search by tag number, breed..."
+                      placeholder="Search by tag number, breed, or investor..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full"
@@ -75,6 +76,7 @@ const Animals = () => {
                   <Badge variant="secondary">Total: {animals.length}</Badge>
                   <Badge variant="secondary">Active: {animals.filter(a => a.status === "Active").length}</Badge>
                   <Badge variant="destructive">Quarantine: {animals.filter(a => a.status === "Quarantine").length}</Badge>
+                  <Badge variant="outline">Assigned: {animals.filter(a => a.investor).length}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -91,6 +93,7 @@ const Animals = () => {
                   status={animal.status}
                   farm={animal.farm}
                   pen={animal.pen}
+                  investor={animal.investor}
                 />
               ))}
             </div>

@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, TrendingUp, TrendingDown } from "lucide-react";
+import { MoreHorizontal, TrendingUp, TrendingDown, User } from "lucide-react";
 
 interface AnimalCardProps {
   tag: string;
@@ -12,9 +12,10 @@ interface AnimalCardProps {
   status: string;
   farm: string;
   pen: string;
+  investor?: string;
 }
 
-export function AnimalCard({ tag, breed, weight, adg, status, farm, pen }: AnimalCardProps) {
+export function AnimalCard({ tag, breed, weight, adg, status, farm, pen, investor }: AnimalCardProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -62,10 +63,17 @@ export function AnimalCard({ tag, breed, weight, adg, status, farm, pen }: Anima
           </div>
         </div>
         
-        <div className="pt-2 border-t border-gray-100">
+        <div className="pt-2 border-t border-gray-100 space-y-2">
           <p className="text-sm text-gray-600">
             <span className="font-medium">{farm}</span> • {pen}
           </p>
+          
+          {investor && (
+            <div className="flex items-center text-sm text-gray-600">
+              <User className="h-4 w-4 mr-2" />
+              <span className="font-medium">Owned by: {investor}</span>
+            </div>
+          )}
         </div>
         
         <div className="flex space-x-2">
