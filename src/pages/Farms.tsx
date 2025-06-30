@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ const Farms = () => {
   const [farms, setFarms] = useState<Farm[]>([
     {
       id: "1",
-      farmNumber: "F001",
+      farmNumber: "Farm A",
       address: "123 Ranch Road, Rural County, TX 75001",
       numberOfPens: 12,
       area: 50.5,
@@ -32,7 +31,7 @@ const Farms = () => {
     },
     {
       id: "2", 
-      farmNumber: "F002",
+      farmNumber: "Farm B",
       address: "456 Cattle Drive, Livestock City, TX 75002",
       numberOfPens: 18,
       area: 75.2,
@@ -41,7 +40,7 @@ const Farms = () => {
     },
     {
       id: "3",
-      farmNumber: "F003", 
+      farmNumber: "Farm C", 
       address: "789 Pasture Lane, Farm Valley, TX 75003",
       numberOfPens: 8,
       area: 32.8,
@@ -154,7 +153,7 @@ const Farms = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900">
-                              Farm {farm.farmNumber}
+                              {farm.farmNumber}
                             </h3>
                             <Badge variant={farm.status === "Active" ? "default" : "secondary"}>
                               {farm.status}
