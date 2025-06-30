@@ -17,8 +17,9 @@ const WeightsVaccination = () => {
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
-  // Mock data for animals needing attention
+  // Mock data for animals needing attention - 3 animals per category
   const [animals, setAnimals] = useState([
+    // Overdue animals (3)
     { 
       tag: "TAG-001", 
       srNo: "001",
@@ -38,10 +39,60 @@ const WeightsVaccination = () => {
       ratePerKg: 112.5,
       mandi: "Central Market",
       purchaser: "Farm Manager",
-      lastWeightCheck: "2024-01-20",
-      lastVaccination: "2024-01-10",
+      arrivalDate: "2024-01-15",
+      lastWeightCheck: "2024-06-20",
+      lastVaccination: "2024-06-10",
       dueStatus: "overdue"
     },
+    { 
+      tag: "TAG-004", 
+      srNo: "004",
+      breed: "Jersey", 
+      coatColor: "Brown",
+      age: 16,
+      weight: 320, 
+      arrivalWeight: 290,
+      adg: 1.0, 
+      status: "Active", 
+      farm: "Farm C", 
+      pen: "Pen 1", 
+      investor: "Mike Wilson",
+      doctor: "Dr. Brown",
+      purchaseDate: "2024-02-20",
+      price: 32000,
+      ratePerKg: 110,
+      mandi: "Local Market",
+      purchaser: "Farm Manager",
+      arrivalDate: "2024-02-20",
+      lastWeightCheck: "2024-06-22",
+      lastVaccination: "2024-06-12",
+      dueStatus: "overdue"
+    },
+    { 
+      tag: "TAG-007", 
+      srNo: "007",
+      breed: "Simmental", 
+      coatColor: "Red & White",
+      age: 20,
+      weight: 520, 
+      arrivalWeight: 480,
+      adg: 1.4, 
+      status: "Active", 
+      farm: "Farm B", 
+      pen: "Pen 4", 
+      investor: "Lisa Davis",
+      doctor: "Dr. Smith",
+      purchaseDate: "2024-01-10",
+      price: 52000,
+      ratePerKg: 108,
+      mandi: "Premium Market",
+      purchaser: "John Doe",
+      arrivalDate: "2024-01-10",
+      lastWeightCheck: "2024-06-18",
+      lastVaccination: "2024-06-08",
+      dueStatus: "overdue"
+    },
+    // Due today animals (3)
     { 
       tag: "TAG-002", 
       srNo: "002",
@@ -61,10 +112,60 @@ const WeightsVaccination = () => {
       ratePerKg: 110,
       mandi: "Livestock Market",
       purchaser: "John Doe",
+      arrivalDate: "2024-02-10",
       lastWeightCheck: "2024-06-29",
       lastVaccination: "2024-06-25",
       dueStatus: "due-today"
     },
+    { 
+      tag: "TAG-005", 
+      srNo: "005",
+      breed: "Charolais", 
+      coatColor: "Cream",
+      age: 14,
+      weight: 395, 
+      arrivalWeight: 360,
+      adg: 1.2, 
+      status: "Active", 
+      farm: "Farm A", 
+      pen: "Pen 5", 
+      investor: "Tom Anderson",
+      doctor: "Dr. Johnson",
+      purchaseDate: "2024-03-15",
+      price: 39500,
+      ratePerKg: 109,
+      mandi: "Central Market",
+      purchaser: "Farm Manager",
+      arrivalDate: "2024-03-15",
+      lastWeightCheck: "2024-06-29",
+      lastVaccination: "2024-06-26",
+      dueStatus: "due-today"
+    },
+    { 
+      tag: "TAG-008", 
+      srNo: "008",
+      breed: "Limousin", 
+      coatColor: "Golden",
+      age: 17,
+      weight: 430, 
+      arrivalWeight: 400,
+      adg: 1.0, 
+      status: "Active", 
+      farm: "Farm C", 
+      pen: "Pen 2", 
+      investor: "Emma Thompson",
+      doctor: "Dr. Brown",
+      purchaseDate: "2024-02-05",
+      price: 43000,
+      ratePerKg: 107,
+      mandi: "Regional Market",
+      purchaser: "John Doe",
+      arrivalDate: "2024-02-05",
+      lastWeightCheck: "2024-06-29",
+      lastVaccination: "2024-06-26",
+      dueStatus: "due-today"
+    },
+    // Due tomorrow animals (3)
     { 
       tag: "TAG-003", 
       srNo: "003",
@@ -83,8 +184,57 @@ const WeightsVaccination = () => {
       ratePerKg: 110,
       mandi: "Regional Market",
       purchaser: "Farm Manager",
+      arrivalDate: "2024-03-05",
       lastWeightCheck: "2024-06-28",
       lastVaccination: "2024-06-20",
+      dueStatus: "due-tomorrow"
+    },
+    { 
+      tag: "TAG-006", 
+      srNo: "006",
+      breed: "Brahman", 
+      coatColor: "Gray",
+      age: 19,
+      weight: 465, 
+      arrivalWeight: 430,
+      adg: 1.1, 
+      status: "Active", 
+      farm: "Farm B", 
+      pen: "Pen 3", 
+      investor: "Robert Lee",
+      doctor: "Dr. Smith",
+      purchaseDate: "2024-01-25",
+      price: 46500,
+      ratePerKg: 108,
+      mandi: "Livestock Market",
+      purchaser: "John Doe",
+      arrivalDate: "2024-01-25",
+      lastWeightCheck: "2024-06-28",
+      lastVaccination: "2024-06-21",
+      dueStatus: "due-tomorrow"
+    },
+    { 
+      tag: "TAG-009", 
+      srNo: "009",
+      breed: "Shorthorn", 
+      coatColor: "Roan",
+      age: 13,
+      weight: 310, 
+      arrivalWeight: 285,
+      adg: 0.8, 
+      status: "Active", 
+      farm: "Farm C", 
+      pen: "Pen 6", 
+      investor: "Nancy White",
+      doctor: "Dr. Brown",
+      purchaseDate: "2024-03-20",
+      price: 31000,
+      ratePerKg: 109,
+      mandi: "Local Market",
+      purchaser: "Farm Manager",
+      arrivalDate: "2024-03-20",
+      lastWeightCheck: "2024-06-28",
+      lastVaccination: "2024-06-22",
       dueStatus: "due-tomorrow"
     }
   ]);
@@ -209,6 +359,7 @@ const WeightsVaccination = () => {
                       ratePerKg={animal.ratePerKg}
                       mandi={animal.mandi}
                       purchaser={animal.purchaser}
+                      arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
                     />
                   ))}
@@ -245,6 +396,7 @@ const WeightsVaccination = () => {
                       ratePerKg={animal.ratePerKg}
                       mandi={animal.mandi}
                       purchaser={animal.purchaser}
+                      arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
                     />
                   ))}
@@ -281,6 +433,7 @@ const WeightsVaccination = () => {
                       ratePerKg={animal.ratePerKg}
                       mandi={animal.mandi}
                       purchaser={animal.purchaser}
+                      arrivalDate={animal.arrivalDate}
                       onWeightUpdate={handleWeightUpdate}
                     />
                   ))}
