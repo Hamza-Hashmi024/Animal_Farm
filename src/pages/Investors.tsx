@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +8,18 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { InvestorCard } from "@/components/InvestorCard";
 import { Search, Filter, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const Investors = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newInvestor, setNewInvestor] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    totalInvestment: 0
+  });
 
   // Mock data for investors with Pakistani names
   const investors = [
@@ -75,6 +83,13 @@ const Investors = () => {
   const totalAnimals = investors.reduce((sum, inv) => sum + inv.animalsOwned, 0);
   const avgROI = investors.reduce((sum, inv) => sum + inv.roi, 0) / investors.length;
 
+  const handleAddInvestor = () => {
+    console.log("Adding new investor:", newInvestor);
+    // Here you would typically add the investor to your data store
+    setShowAddDialog(false);
+    setNewInvestor({ name: "", email: "", phone: "", totalInvestment: 0 });
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -89,10 +104,78 @@ const Investors = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Investor Management</h1>
                 <p className="text-gray-600 mt-1">Manage investor portfolios and track performance</p>
               </div>
-              <Button className="bg-green-600 hover:bg-green-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Investor
-              </Button>
+              <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                <DialogTrigger asChild>
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Investor
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Investor</DialogTitle>
+                    <DialogDescription>
+                      Enter the details for the new investor.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        value={newInvestor.name}
+                        onChange={(e) => setNewInvestor({ ...newInvestor, name: e.target.value })}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="email" className="text-right">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newInvestor.email}
+                        onChange={(e) => setNewInvestor({ ...newInvestor, email: e.target.value })}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="phone" className="text-right">
+                        Phone
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={newInvestor.phone}
+                        onChange={(e) => setNewInvestor({ ...newInvestor, phone: e.target.value })}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="investment" className="text-right">
+                        Investment
+                      </Label>
+                      <Input
+                        id="investment"
+                        type="number"
+                        value={newInvestor.totalInvestment}
+                        onChange={(e) => setNewInvestor({ ...newInvestor, totalInvestment: Number(e.target.value) })}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddInvestor} className="bg-green-600 hover:bg-green-700">
+                      Add Investor
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Summary Cards */}

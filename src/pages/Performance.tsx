@@ -61,21 +61,21 @@ const Performance = () => {
           <div className="p-6 space-y-2">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Weight Performance</h1>
-              <p className="text-gray-600 mt-1">Monitor livestock weight performance and ADG criteria</p>
+              <p className="text-gray-700 mt-1 font-medium">Monitor livestock weight performance and ADG criteria</p>
             </div>
 
-            {/* Filters Section - Even more compact */}
-            <Card>
+            {/* Filters Section - Improved contrast */}
+            <Card className="border-gray-300">
               <CardHeader className="pb-1">
-                <CardTitle className="text-sm">Filters</CardTitle>
-                <CardDescription className="text-xs">Filter animals by farm, pen, and breed</CardDescription>
+                <CardTitle className="text-sm font-semibold text-gray-900">Filters</CardTitle>
+                <CardDescription className="text-xs font-medium text-gray-700">Filter animals by farm, pen, and breed</CardDescription>
               </CardHeader>
               <CardContent className="pb-2">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium">Farm</label>
+                    <label className="text-xs font-semibold text-gray-800">Farm</label>
                     <Select value={selectedFarm} onValueChange={setSelectedFarm}>
-                      <SelectTrigger className="h-7 text-xs">
+                      <SelectTrigger className="h-7 text-xs border-gray-400 text-gray-900 font-medium">
                         <SelectValue placeholder="Select farm" />
                       </SelectTrigger>
                       <SelectContent>
@@ -88,9 +88,9 @@ const Performance = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium">Pen</label>
+                    <label className="text-xs font-semibold text-gray-800">Pen</label>
                     <Select value={selectedPen} onValueChange={setSelectedPen}>
-                      <SelectTrigger className="h-7 text-xs">
+                      <SelectTrigger className="h-7 text-xs border-gray-400 text-gray-900 font-medium">
                         <SelectValue placeholder="Select pen" />
                       </SelectTrigger>
                       <SelectContent>
@@ -103,9 +103,9 @@ const Performance = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-medium">Breed</label>
+                    <label className="text-xs font-semibold text-gray-800">Breed</label>
                     <Select value={selectedBreed} onValueChange={setSelectedBreed}>
-                      <SelectTrigger className="h-7 text-xs">
+                      <SelectTrigger className="h-7 text-xs border-gray-400 text-gray-900 font-medium">
                         <SelectValue placeholder="Select breed" />
                       </SelectTrigger>
                       <SelectContent>
@@ -123,91 +123,91 @@ const Performance = () => {
               </CardContent>
             </Card>
 
-            {/* Average Cards - Even more compact */}
+            {/* Average Cards - Improved contrast */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <Card>
+              <Card className="border-gray-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-                  <CardTitle className="text-xs font-medium">Average Weight</CardTitle>
-                  <Scale className="h-3 w-3 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold text-gray-900">Average Weight</CardTitle>
+                  <Scale className="h-3 w-3 text-gray-700" />
                 </CardHeader>
                 <CardContent className="pb-1">
-                  <div className="text-lg font-bold">{averageWeight} kg</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-lg font-bold text-gray-900">{averageWeight} kg</div>
+                  <p className="text-xs text-gray-700 font-medium">
                     Based on {filteredAnimals.length} animals
                   </p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-gray-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-                  <CardTitle className="text-xs font-medium">Average Daily Gain</CardTitle>
-                  <TrendingUp className="h-3 w-3 text-muted-foreground" />
+                  <CardTitle className="text-xs font-semibold text-gray-900">Average Daily Gain</CardTitle>
+                  <TrendingUp className="h-3 w-3 text-gray-700" />
                 </CardHeader>
                 <CardContent className="pb-1">
-                  <div className="text-lg font-bold">{averageADG} kg/day</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-lg font-bold text-gray-900">{averageADG} kg/day</div>
+                  <p className="text-xs text-gray-700 font-medium">
                     Based on {filteredAnimals.length} animals
                   </p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Low Performers Section */}
-            <Card>
+            {/* Low Performers Section - Improved contrast */}
+            <Card className="border-gray-300">
               <CardHeader>
-                <CardTitle>Low Performers</CardTitle>
-                <CardDescription>Animals below performance thresholds</CardDescription>
+                <CardTitle className="text-gray-900 font-bold">Low Performers</CardTitle>
+                <CardDescription className="text-gray-700 font-medium">Animals below performance thresholds</CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="0.5kg" className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="0.5kg">ADG ≤ 0.5 kg</TabsTrigger>
-                    <TabsTrigger value="0.8kg">ADG ≤ 0.8 kg</TabsTrigger>
-                    <TabsTrigger value="custom">Set Custom Criteria</TabsTrigger>
+                    <TabsTrigger value="0.5kg" className="text-xs font-medium">ADG ≤ 0.5 kg</TabsTrigger>
+                    <TabsTrigger value="0.8kg" className="text-xs font-medium">ADG ≤ 0.8 kg</TabsTrigger>
+                    <TabsTrigger value="custom" className="text-xs font-medium">Set Custom Criteria</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="0.5kg" className="space-y-3 mt-4">
                     {lowPerformers05.length > 0 ? (
                       lowPerformers05.map((animal, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div key={index} className="flex items-center justify-between p-3 bg-red-100 rounded-lg border-2 border-red-300">
                           <div>
-                            <p className="font-medium">{animal.tag}</p>
-                            <p className="text-sm text-gray-600">{animal.breed} • {animal.farm} • {animal.pen}</p>
+                            <p className="font-bold text-gray-900">{animal.tag}</p>
+                            <p className="text-sm text-gray-800 font-medium">{animal.breed} • {animal.farm} • {animal.pen}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-red-700">{animal.adg} kg/day</p>
-                            <p className="text-sm text-gray-600">{animal.weight} kg</p>
+                            <p className="font-bold text-red-800 text-lg">{animal.adg} kg/day</p>
+                            <p className="text-sm text-gray-800 font-medium">{animal.weight} kg</p>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No animals match the criteria</p>
+                      <p className="text-gray-700 text-center py-4 font-medium">No animals match the criteria</p>
                     )}
                   </TabsContent>
                   
                   <TabsContent value="0.8kg" className="space-y-3 mt-4">
                     {lowPerformers08.length > 0 ? (
                       lowPerformers08.map((animal, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div key={index} className="flex items-center justify-between p-3 bg-red-100 rounded-lg border-2 border-red-300">
                           <div>
-                            <p className="font-medium">{animal.tag}</p>
-                            <p className="text-sm text-gray-600">{animal.breed} • {animal.farm} • {animal.pen}</p>
+                            <p className="font-bold text-gray-900">{animal.tag}</p>
+                            <p className="text-sm text-gray-800 font-medium">{animal.breed} • {animal.farm} • {animal.pen}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-red-700">{animal.adg} kg/day</p>
-                            <p className="text-sm text-gray-600">{animal.weight} kg</p>
+                            <p className="font-bold text-red-800 text-lg">{animal.adg} kg/day</p>
+                            <p className="text-sm text-gray-800 font-medium">{animal.weight} kg</p>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No animals match the criteria</p>
+                      <p className="text-gray-700 text-center py-4 font-medium">No animals match the criteria</p>
                     )}
                   </TabsContent>
                   
                   <TabsContent value="custom" className="mt-4">
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <label htmlFor="custom-criteria" className="text-sm font-medium">
+                        <label htmlFor="custom-criteria" className="text-sm font-semibold text-gray-900">
                           Custom ADG Threshold (kg/day):
                         </label>
                         <Input
@@ -217,11 +217,11 @@ const Performance = () => {
                           placeholder="e.g., 1.0"
                           value={customCriteria}
                           onChange={(e) => setCustomCriteria(e.target.value)}
-                          className="w-32"
+                          className="w-32 border-gray-400 text-gray-900"
                         />
-                        <Button size="sm">Apply Filter</Button>
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-medium">Apply Filter</Button>
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-700 font-medium">
                         Enter a custom ADG threshold to filter animals below this performance level.
                       </p>
                     </div>
@@ -230,32 +230,32 @@ const Performance = () => {
               </CardContent>
             </Card>
 
-            {/* Top Performers Section */}
-            <Card>
+            {/* Top Performers Section - Improved contrast */}
+            <Card className="border-gray-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-green-600" />
+                <CardTitle className="flex items-center gap-2 text-gray-900 font-bold">
+                  <Target className="h-5 w-5 text-green-700" />
                   Top Performers
                 </CardTitle>
-                <CardDescription>Animals with highest average daily gain</CardDescription>
+                <CardDescription className="text-gray-700 font-medium">Animals with highest average daily gain</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {topPerformers.length > 0 ? (
                     topPerformers.map((animal, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div key={index} className="flex items-center justify-between p-3 bg-green-100 rounded-lg border-2 border-green-300">
                         <div>
-                          <p className="font-medium">{animal.tag}</p>
-                          <p className="text-sm text-gray-600">{animal.breed} • {animal.farm} • {animal.pen}</p>
+                          <p className="font-bold text-gray-900">{animal.tag}</p>
+                          <p className="text-sm text-gray-800 font-medium">{animal.breed} • {animal.farm} • {animal.pen}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-green-700">{animal.adg} kg/day</p>
-                          <p className="text-sm text-gray-600">{animal.weight} kg</p>
+                          <p className="font-bold text-green-800 text-lg">{animal.adg} kg/day</p>
+                          <p className="text-sm text-gray-800 font-medium">{animal.weight} kg</p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center py-4">No animals match the criteria</p>
+                    <p className="text-gray-700 text-center py-4 font-medium">No animals match the criteria</p>
                   )}
                 </div>
               </CardContent>
