@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,8 +17,8 @@ const WeightsVaccination = () => {
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
 
-  // Helper function to create sequential checkpoint schedule
-  const createCheckpointSchedule = (animalTag: string, arrivalDate: string, overdueDay?: number, dueTodayDay?: number, dueTomorrowDay?: number) => {
+  // Helper function to create sequential checkpoint schedule with PROPER logic
+  const createCheckpointSchedule = (animalTag: string, arrivalDate: string, targetStatus: 'overdue' | 'due-today' | 'due-tomorrow', targetDay: number) => {
     const arrival = new Date(arrivalDate);
     const today = new Date().toISOString().split('T')[0];
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -28,8 +27,6 @@ const WeightsVaccination = () => {
     const days = [0, 3, 7, 21, 50, 75];
     const names = ["Arrival", "Day 3 Check", "Day 7 Check", "Day 21 Check", "Day 50 Check", "Day 75 Check"];
     
-    let foundOverdue = false;
-    
     for (let i = 0; i < days.length; i++) {
       const day = days[i];
       const scheduledDate = new Date(arrival.getTime() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -37,43 +34,35 @@ const WeightsVaccination = () => {
       let completed = false;
       let actualDate = undefined;
       let weight = undefined;
+      let finalScheduledDate = scheduledDate;
       
-      // Day 0 (arrival) is always completed
+      // Day 0 (arrival) is ALWAYS completed
       if (day === 0) {
         completed = true;
         actualDate = arrivalDate;
-        weight = day === 0 ? 400 : undefined;
+        weight = 400;
       }
-      // If this is the overdue day, mark it as incomplete and stop completing future ones
-      else if (day === overdueDay) {
-        foundOverdue = true;
-        completed = false;
-      }
-      // If this is due today
-      else if (day === dueTodayDay) {
-        foundOverdue = true;
-        completed = false;
-      }
-      // If this is due tomorrow
-      else if (day === dueTomorrowDay) {
-        foundOverdue = true;
-        completed = false;
-      }
-      // If we haven't found the target day yet, mark previous ones as completed
-      else if (!foundOverdue && day < (overdueDay || dueTodayDay || dueTomorrowDay || 999)) {
+      // Complete all checkpoints BEFORE the target day
+      else if (day < targetDay) {
         completed = true;
         actualDate = scheduledDate;
-        weight = 400 + (day * 10); // Progressive weight gain
+        weight = 400 + (day * 10);
       }
-      
-      // Adjust scheduled date for specific scenarios
-      let finalScheduledDate = scheduledDate;
-      if (day === overdueDay) {
-        finalScheduledDate = "2024-06-25"; // Make it clearly overdue
-      } else if (day === dueTodayDay) {
-        finalScheduledDate = today;
-      } else if (day === dueTomorrowDay) {
-        finalScheduledDate = tomorrow;
+      // The target day gets the specific status
+      else if (day === targetDay) {
+        completed = false;
+        if (targetStatus === 'overdue') {
+          finalScheduledDate = "2024-06-25"; // Make it clearly overdue
+        } else if (targetStatus === 'due-today') {
+          finalScheduledDate = today;
+        } else if (targetStatus === 'due-tomorrow') {
+          finalScheduledDate = tomorrow;
+        }
+      }
+      // All days AFTER the target day remain upcoming (not completed, future dates)
+      else {
+        completed = false;
+        // Keep future scheduled dates as they are
       }
       
       checkpoints.push({
@@ -85,7 +74,7 @@ const WeightsVaccination = () => {
         completed,
         actualDate,
         weight,
-        // Add sample data for completed checkpoints
+        // Add sample data for completed checkpoints only
         ...(completed && day > 0 ? {
           vaccine: {
             name: `Vaccine-${day}`,
@@ -104,9 +93,9 @@ const WeightsVaccination = () => {
     return checkpoints;
   };
 
-  // Mock data for animals with proper sequential checkpoint schedules
+  // Mock data with CORRECTED checkpoint logic
   const [animals, setAnimals] = useState([
-    // Overdue animals (3) - each with 1 overdue checkpoint and properly completed previous ones
+    // Overdue animals - each has ONLY ONE overdue checkpoint
     { 
       tag: "TAG-001", 
       srNo: "001",
@@ -127,7 +116,7 @@ const WeightsVaccination = () => {
       mandi: "Central Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-01-15",
-      checkpoints: createCheckpointSchedule("TAG-001", "2024-01-15", 21) // Day 21 is overdue, 0,3,7 completed
+      checkpoints: createCheckpointSchedule("TAG-001", "2024-01-15", 'overdue', 21) // Day 21 overdue, 0,3,7 completed, 50,75 upcoming
     },
     { 
       tag: "TAG-004", 
@@ -149,7 +138,7 @@ const WeightsVaccination = () => {
       mandi: "Local Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-02-20",
-      checkpoints: createCheckpointSchedule("TAG-004", "2024-02-20", 50) // Day 50 is overdue, 0,3,7,21 completed
+      checkpoints: createCheckpointSchedule("TAG-004", "2024-02-20", 'overdue', 7) // Day 7 overdue, 0,3 completed, 21,50,75 upcoming
     },
     { 
       tag: "TAG-007", 
@@ -171,9 +160,9 @@ const WeightsVaccination = () => {
       mandi: "Premium Market",
       purchaser: "John Doe",
       arrivalDate: "2024-01-10",
-      checkpoints: createCheckpointSchedule("TAG-007", "2024-01-10", 7) // Day 7 is overdue, 0,3 completed
+      checkpoints: createCheckpointSchedule("TAG-007", "2024-01-10", 'overdue', 3) // Day 3 overdue, 0 completed, 7,21,50,75 upcoming
     },
-    // Due today animals (3) - each with 1 checkpoint due today and properly completed previous ones
+    // Due today animals - each has ONLY ONE checkpoint due today
     { 
       tag: "TAG-002", 
       srNo: "002",
@@ -194,7 +183,7 @@ const WeightsVaccination = () => {
       mandi: "Livestock Market",
       purchaser: "John Doe",
       arrivalDate: "2024-02-10",
-      checkpoints: createCheckpointSchedule("TAG-002", "2024-02-10", undefined, 21) // Day 21 is due today, 0,3,7 completed
+      checkpoints: createCheckpointSchedule("TAG-002", "2024-02-10", 'due-today', 21) // Day 21 due today, 0,3,7 completed, 50,75 upcoming
     },
     { 
       tag: "TAG-005", 
@@ -216,7 +205,7 @@ const WeightsVaccination = () => {
       mandi: "Central Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-15",
-      checkpoints: createCheckpointSchedule("TAG-005", "2024-03-15", undefined, 3) // Day 3 is due today, 0 completed
+      checkpoints: createCheckpointSchedule("TAG-005", "2024-03-15", 'due-today', 3) // Day 3 due today, 0 completed, 7,21,50,75 upcoming
     },
     { 
       tag: "TAG-008", 
@@ -238,9 +227,9 @@ const WeightsVaccination = () => {
       mandi: "Regional Market",
       purchaser: "John Doe",
       arrivalDate: "2024-02-05",
-      checkpoints: createCheckpointSchedule("TAG-008", "2024-02-05", undefined, 50) // Day 50 is due today, 0,3,7,21 completed
+      checkpoints: createCheckpointSchedule("TAG-008", "2024-02-05", 'due-today', 50) // Day 50 due today, 0,3,7,21 completed, 75 upcoming
     },
-    // Due tomorrow animals (3) - each with 1 checkpoint due tomorrow and properly completed previous ones
+    // Due tomorrow animals - each has ONLY ONE checkpoint due tomorrow
     { 
       tag: "TAG-003", 
       srNo: "003",
@@ -260,7 +249,7 @@ const WeightsVaccination = () => {
       mandi: "Regional Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-05",
-      checkpoints: createCheckpointSchedule("TAG-003", "2024-03-05", undefined, undefined, 7) // Day 7 is due tomorrow, 0,3 completed
+      checkpoints: createCheckpointSchedule("TAG-003", "2024-03-05", 'due-tomorrow', 7) // Day 7 due tomorrow, 0,3 completed, 21,50,75 upcoming
     },
     { 
       tag: "TAG-006", 
@@ -282,7 +271,7 @@ const WeightsVaccination = () => {
       mandi: "Livestock Market",
       purchaser: "John Doe",
       arrivalDate: "2024-01-25",
-      checkpoints: createCheckpointSchedule("TAG-006", "2024-01-25", undefined, undefined, 21) // Day 21 is due tomorrow, 0,3,7 completed
+      checkpoints: createCheckpointSchedule("TAG-006", "2024-01-25", 'due-tomorrow', 21) // Day 21 due tomorrow, 0,3,7 completed, 50,75 upcoming
     },
     { 
       tag: "TAG-009", 
@@ -304,7 +293,7 @@ const WeightsVaccination = () => {
       mandi: "Local Market",
       purchaser: "Farm Manager",
       arrivalDate: "2024-03-20",
-      checkpoints: createCheckpointSchedule("TAG-009", "2024-03-20", undefined, undefined, 3) // Day 3 is due tomorrow, 0 completed
+      checkpoints: createCheckpointSchedule("TAG-009", "2024-03-20", 'due-tomorrow', 3) // Day 3 due tomorrow, 0 completed, 7,21,50,75 upcoming
     }
   ]);
 
