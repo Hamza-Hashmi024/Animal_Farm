@@ -1,8 +1,12 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, TrendingUp, TrendingDown, User, Stethoscope, Calendar, DollarSign } from "lucide-react";
+import { MoreHorizontal, TrendingUp, TrendingDown, User, Stethoscope, Calendar, DollarSign, Clock, AlertTriangle } from "lucide-react";
+import { ScheduledCheckpoints } from "./ScheduledCheckpoints";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkpoint } from "@/types/checkpoint";
+import { generateCheckpointSchedule, getOverdueCheckpoints, getDueCheckpoints } from "@/utils/checkpointUtils";
 
 interface AnimalCardProps {
   tag: string;
@@ -23,6 +27,7 @@ interface AnimalCardProps {
   ratePerKg?: number;
   mandi?: string;
   purchaser?: string;
+  arrivalDate?: string;
 }
 
 export function AnimalCard({ 
@@ -43,8 +48,14 @@ export function AnimalCard({
   price,
   ratePerKg,
   mandi,
-  purchaser
+  purchaser,
+  arrivalDate
 }: AnimalCardProps) {
+  const [showHealthDialog, setShowHealthDialog] = useState(false);
+  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(
+    generateCheckpointSchedule(tag, arrivalDate || purchaseDate || '2024-06-01')
+  );
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -55,108 +66,159 @@ export function AnimalCard({
   };
 
   const isGoodADG = adg >= 1.0;
+  const overdueCheckpoints = getOverdueCheckpoints(checkpoints);
+  const dueCheckpoints = getDueCheckpoints(checkpoints);
+  const hasHealthAlerts = overdueCheckpoints.length > 0 || dueCheckpoints.length > 0;
+
+  const handleCheckpointUpdate = (updatedCheckpoint: Checkpoint) => {
+    setCheckpoints(prev => prev.map(cp => 
+      cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
+    ));
+  };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div>
-              <h3 className="font-semibold text-lg">{tag}</h3>
-              <p className="text-xs text-gray-500">Sr. No: {srNo}</p>
-            </div>
-            <Badge className={getStatusColor(status)}>
-              {status}
-            </Badge>
-          </div>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-gray-700">{breed}</p>
-          {coatColor && <p className="text-xs text-gray-500">{coatColor}</p>}
-          {age && <p className="text-xs text-gray-500">{age} months old</p>}
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Current Weight</p>
-            <p className="text-xl font-bold">{weight} kg</p>
-            {arrivalWeight && (
-              <p className="text-xs text-gray-500">From {arrivalWeight} kg</p>
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">ADG</p>
-            <div className="flex items-center space-x-1">
-              <p className="text-xl font-bold">{adg}</p>
-              {isGoodADG ? (
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-red-500" />
+    <>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div>
+                <h3 className="font-semibold text-lg">{tag}</h3>
+                <p className="text-xs text-gray-500">Sr. No: {srNo}</p>
+              </div>
+              <Badge className={getStatusColor(status)}>
+                {status}
+              </Badge>
+              {hasHealthAlerts && (
+                <Badge variant="destructive" className="text-xs">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  {overdueCheckpoints.length > 0 ? 'Overdue' : 'Due'}
+                </Badge>
               )}
             </div>
+            <Button variant="ghost" size="sm">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-
-        {price && (
-          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-700">{breed}</p>
+            {coatColor && <p className="text-xs text-gray-500">{coatColor}</p>}
+            {age && <p className="text-xs text-gray-500">{age} months old</p>}
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">Purchase Price</p>
-              <p className="text-sm font-bold">₹{price.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-500">Current Weight</p>
+              <p className="text-xl font-bold">{weight} kg</p>
+              {arrivalWeight && (
+                <p className="text-xs text-gray-500">From {arrivalWeight} kg</p>
+              )}
             </div>
-            {ratePerKg && (
+            <div>
+              <p className="text-sm font-medium text-gray-500">ADG</p>
+              <div className="flex items-center space-x-1">
+                <p className="text-xl font-bold">{adg}</p>
+                {isGoodADG ? (
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-red-500" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {price && (
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <div>
-                <p className="text-sm font-medium text-gray-500">Rate/kg</p>
-                <p className="text-sm font-bold">₹{ratePerKg}</p>
+                <p className="text-sm font-medium text-gray-500">Purchase Price</p>
+                <p className="text-sm font-bold">₹{price.toLocaleString()}</p>
+              </div>
+              {ratePerKg && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Rate/kg</p>
+                  <p className="text-sm font-bold">₹{ratePerKg}</p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <div className="pt-2 border-t border-gray-100 space-y-2">
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">{farm}</span> • {pen}
+            </p>
+            
+            {investor && (
+              <div className="flex items-center text-sm text-gray-600">
+                <User className="h-4 w-4 mr-2" />
+                <span className="font-medium">Investor: {investor}</span>
               </div>
             )}
+
+            {doctor && (
+              <div className="flex items-center text-sm text-gray-600">
+                <Stethoscope className="h-4 w-4 mr-2" />
+                <span className="font-medium">Doctor: {doctor}</span>
+              </div>
+            )}
+
+            {purchaseDate && (
+              <div className="flex items-center text-xs text-gray-500">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span>Purchased: {new Date(purchaseDate).toLocaleDateString()}</span>
+              </div>
+            )}
+
+            {mandi && (
+              <p className="text-xs text-gray-500">Market: {mandi}</p>
+            )}
           </div>
-        )}
-        
-        <div className="pt-2 border-t border-gray-100 space-y-2">
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">{farm}</span> • {pen}
-          </p>
+
+          {/* Health Status */}
+          {hasHealthAlerts && (
+            <div className="pt-2 border-t border-gray-100">
+              <div className="flex items-center text-sm text-red-600">
+                <Clock className="h-4 w-4 mr-2" />
+                <span>
+                  {overdueCheckpoints.length > 0 
+                    ? `${overdueCheckpoints.length} overdue checkpoint${overdueCheckpoints.length > 1 ? 's' : ''}`
+                    : `${dueCheckpoints.length} checkpoint${dueCheckpoints.length > 1 ? 's' : ''} due today`
+                  }
+                </span>
+              </div>
+            </div>
+          )}
           
-          {investor && (
-            <div className="flex items-center text-sm text-gray-600">
-              <User className="h-4 w-4 mr-2" />
-              <span className="font-medium">Investor: {investor}</span>
-            </div>
-          )}
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" className="flex-1">
+              View Details
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => setShowHealthDialog(true)}
+            >
+              <Stethoscope className="h-4 w-4 mr-1" />
+              Health Check
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-          {doctor && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Stethoscope className="h-4 w-4 mr-2" />
-              <span className="font-medium">Doctor: {doctor}</span>
-            </div>
-          )}
-
-          {purchaseDate && (
-            <div className="flex items-center text-xs text-gray-500">
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>Purchased: {new Date(purchaseDate).toLocaleDateString()}</span>
-            </div>
-          )}
-
-          {mandi && (
-            <p className="text-xs text-gray-500">Market: {mandi}</p>
-          )}
-        </div>
-        
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm" className="flex-1">
-            View Details
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1">
-            Health Check
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Health Check Dialog */}
+      <Dialog open={showHealthDialog} onOpenChange={setShowHealthDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Health Monitoring - {tag}</DialogTitle>
+          </DialogHeader>
+          <ScheduledCheckpoints 
+            checkpoints={checkpoints}
+            onCheckpointUpdate={handleCheckpointUpdate}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
