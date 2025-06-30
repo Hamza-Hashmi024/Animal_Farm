@@ -8,10 +8,9 @@ import Index from "./pages/Index";
 import RegisterAnimal from "./pages/RegisterAnimal";
 import WeightsVaccination from "./pages/WeightsVaccination";
 import Investors from "./pages/Investors";
-import Health from "./pages/Health";
+import Farms from "./pages/Farms";
 import Incidents from "./pages/Incidents";
 import Performance from "./pages/Performance";
-import Settings from "./pages/Settings";
 import SlaughterRecording from "./pages/SlaughterRecording";
 import NotFound from "./pages/NotFound";
 
@@ -28,11 +27,10 @@ const App = () => (
           <Route path="/register-animal" element={<RegisterAnimal />} />
           <Route path="/weights-vaccination" element={<WeightsVaccination />} />
           <Route path="/investors" element={<Investors />} />
-          <Route path="/health" element={<Health />} />
+          <Route path="/farms" element={<Farms />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/slaughter-recording" element={<SlaughterRecording />} />
-          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

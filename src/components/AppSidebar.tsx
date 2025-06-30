@@ -1,7 +1,7 @@
+
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home, 
-  Settings, 
   Calendar, 
   FileText, 
   AlertTriangle, 
@@ -9,7 +9,8 @@ import {
   Users,
   Scale,
   UserPlus,
-  Beef
+  Beef,
+  MapPin
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,11 +30,10 @@ const navigation = [
   { name: "Register Animal", href: "/register-animal", icon: UserPlus },
   { name: "Weights & Vaccination", href: "/weights-vaccination", icon: Scale },
   { name: "Investors", href: "/investors", icon: Users },
-  { name: "Health Monitoring", href: "/health", icon: Calendar },
+  { name: "Farms", href: "/farms", icon: MapPin },
   { name: "Incidents", href: "/incidents", icon: AlertTriangle },
   { name: "Performance", href: "/performance", icon: TrendingUp },
   { name: "Slaughter Recording", href: "/slaughter-recording", icon: Beef },
-  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
