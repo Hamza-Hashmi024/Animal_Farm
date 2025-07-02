@@ -1,8 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
-const Port = 5000;
+const Port = process.env.PORT;
 const app = express();
 const server = http.createServer(app);
+const db = require("./config/db");
 
 app.get("/", (req, res) => {
   res.send(`Server Is Created Successfully on Port ${Port}`);
