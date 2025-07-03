@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState , useEffect  } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon } from "lucide-react";
+import { FarmRegistrationApi} from "@/Apis/Api"; 
 
 interface AddFarmDialogProps {
   open: boolean;
@@ -28,21 +29,36 @@ export function AddFarmDialog({ open, onOpenChange, onAddFarm }: AddFarmDialogPr
     startDate: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.farmNumber || !formData.address || !formData.numberOfPens || !formData.area || !formData.startDate) {
-      alert("Please fill in all fields");
-      return;
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    onAddFarm({
-      farmNumber: formData.farmNumber,
-      address: formData.address,
-      numberOfPens: parseInt(formData.numberOfPens),
-      area: parseFloat(formData.area),
-      startDate: formData.startDate
-    });
+  if (
+    !formData.farmNumber ||
+    !formData.address ||
+    !formData.numberOfPens ||
+    !formData.area ||
+    !formData.startDate
+  ) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  const newFarm = {
+    farmNumber: formData.farmNumber,
+    address: formData.address,
+    numberOfPens: parseInt(formData.numberOfPens),
+    area: parseFloat(formData.area),
+    startDate: formData.startDate,
+  };
+
+  try {
+    const response = await FarmRegistrationApi(newFarm);
+
+    // Optionally use response for confirmation
+    console.log("Farm registered successfully:", response);
+
+    // Notify parent component
+    onAddFarm(newFarm);
 
     // Reset form
     setFormData({
@@ -50,9 +66,17 @@ export function AddFarmDialog({ open, onOpenChange, onAddFarm }: AddFarmDialogPr
       address: "",
       numberOfPens: "",
       area: "",
-      startDate: ""
+      startDate: "",
     });
-  };
+
+    // Close dialog
+    onOpenChange(false);
+  } catch (error) {
+    console.error("Failed to register farm:", error);
+    alert("Failed to register farm. Please try again.");
+  }
+};
+
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
