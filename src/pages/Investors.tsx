@@ -10,6 +10,7 @@ import { InvestorCard } from "@/components/InvestorCard";
 import { Search, Filter, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { InvestorRegistrationApi } from "@/Apis/Api"; 
 
 const Investors = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,12 +84,32 @@ const Investors = () => {
   const totalAnimals = investors.reduce((sum, inv) => sum + inv.animalsOwned, 0);
   const avgROI = investors.reduce((sum, inv) => sum + inv.roi, 0) / investors.length;
 
-  const handleAddInvestor = () => {
-    console.log("Adding new investor:", newInvestor);
-    // Here you would typically add the investor to your data store
+const handleAddInvestor = async () => {
+  try {
+    const payload = {
+      name: newInvestor.name,
+      email: newInvestor.email,
+      phone: newInvestor.phone,
+      total_investment: newInvestor.totalInvestment, // match backend key
+      // Optionally add: id: `INV-${Date.now()}` — if backend doesn't auto-generate
+    };
+
+    console.log("Adding new investor:", payload);
+
+    await InvestorRegistrationApi(payload);  
+
+    // Optionally show a success toast here
     setShowAddDialog(false);
     setNewInvestor({ name: "", email: "", phone: "", totalInvestment: 0 });
-  };
+
+    // If you're managing investor list via state, also update that here
+    // setInvestors([...investors, { ...payload, id: generatedId, status: "Active", joinDate: today, ... }])
+
+  } catch (error) {
+    console.error("Error adding investor:", error);
+    // Optionally show error toast here
+  }
+};
 
   return (
     <SidebarProvider>

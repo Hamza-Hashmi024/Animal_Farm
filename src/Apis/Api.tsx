@@ -26,3 +26,13 @@ export const FarmRegistrationApi = async (data) => {
   }
 }
 
+export const InvestorRegistrationApi = async (data) => {
+  try {
+    const response = await axios.post(`${Base_Url}/api/invester/register`, data);
+    console.log("InvestorRegistrationApi response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error in InvestorRegistrationApi:", err);
+    throw err;
+  }
+};
