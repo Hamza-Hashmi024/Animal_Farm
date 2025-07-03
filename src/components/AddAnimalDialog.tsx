@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
+import { AnimalRegistrationApi } from "@/Apis/Api";
 interface AddAnimalDialogProps {
   onAddAnimal: (animal: any) => void;
 }
@@ -34,41 +34,44 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.tag || !formData.srNo || !formData.breed || !formData.arrivalWeight || 
-        !formData.purchaseDate || !formData.price || !formData.farm || !formData.pen) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
-    }
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const newAnimal = {
-      tag: formData.tag,
-      srNo: formData.srNo,
-      breed: formData.breed,
-      coatColor: formData.coatColor,
-      age: parseInt(formData.age) || 0,
-      weight: parseFloat(formData.arrivalWeight),
-      arrivalWeight: parseFloat(formData.arrivalWeight),
-      purchaseDate: formData.purchaseDate,
-      price: parseFloat(formData.price),
-      ratePerKg: parseFloat(formData.ratePerKg) || 0,
-      mandi: formData.mandi,
-      purchaser: formData.purchaser,
-      farm: formData.farm,
-      pen: formData.pen,
-      investor: formData.investor || undefined,
-      doctor: formData.doctor,
-      status: formData.status,
-      adg: 0 // Will be calculated over time
-    };
+  if (!formData.tag || !formData.srNo || !formData.breed || !formData.arrivalWeight || 
+      !formData.purchaseDate || !formData.price || !formData.farm || !formData.pen) {
+    toast({
+      title: "Error",
+      description: "Please fill in all required fields",
+      variant: "destructive"
+    });
+    return;
+  }
 
-    onAddAnimal(newAnimal);
+  const newAnimal = {
+    tag: formData.tag,
+    srNo: formData.srNo,
+    breed: formData.breed,
+    coatColor: formData.coatColor,
+    age: parseInt(formData.age) || 0,
+    weight: parseFloat(formData.arrivalWeight),
+    arrivalWeight: parseFloat(formData.arrivalWeight),
+    purchaseDate: formData.purchaseDate,
+    price: parseFloat(formData.price),
+    ratePerKg: parseFloat(formData.ratePerKg) || 0,
+    mandi: formData.mandi,
+    purchaser: formData.purchaser,
+    farm: formData.farm,
+    pen: formData.pen,
+    investor: formData.investor || undefined,
+    doctor: formData.doctor,
+    status: formData.status,
+    adg: 0
+  };
+
+  try {
+    const result = await AnimalRegistrationApi(newAnimal);
+    onAddAnimal(result); // Optional: Update parent state if needed
+
     setFormData({
       tag: "",
       srNo: "",
@@ -88,12 +91,20 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       status: "Active"
     });
     setOpen(false);
-    
+
     toast({
       title: "Success",
       description: "Animal registered successfully"
     });
-  };
+  } catch (err) {
+    toast({
+      title: "API Error",
+      description: "Failed to register animal",
+      variant: "destructive"
+    });
+  }
+};
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

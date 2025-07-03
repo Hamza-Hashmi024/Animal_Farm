@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const Port = process.env.PORT;
+const cors = require("cors");
 const app = express();
 const server = http.createServer(app);
 const db = require("./config/db");
@@ -9,8 +10,15 @@ const animalRoutes = require("./Routes/AnimalRoutes");
 
 
 
-
 app.use(express.json());
+
+
+app.use(cors({
+  origin: "http://localhost:8080", 
+  credentials: true
+}));
+
+
 app.use("/api", animalRoutes);
 
 app.get("/", (req, res) => {
