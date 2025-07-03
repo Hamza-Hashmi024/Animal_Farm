@@ -44,6 +44,26 @@ const registerFarm = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+const farm_number = (req, res) => {
+  const query = `SELECT farm_number FROM farms`;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching farm numbers:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: "No farms found" });
+    }
+
+    res.status(200).json(results);
+  });
+};
+
+
 module.exports = {
-  registerFarm
+  registerFarm,
+  farm_number
 };

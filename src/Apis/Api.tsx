@@ -36,3 +36,26 @@ export const InvestorRegistrationApi = async (data) => {
     throw err;
   }
 };
+
+export const FarmNumbersApi = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/farm/numbers`);
+    console.log("FarmNumbersApi response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error in FarmNumbersApi:", err);
+    throw err;
+  }
+};
+
+export const InvestorNamesApi = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/invester/names`);
+    console.log("InvestorNamesApi response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error in InvestorNamesApi:", err);
+    throw err;
+  }
+};
+

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AnimalRegistrationApi } from "@/Apis/Api";
+import { AnimalRegistrationApi , FarmNumbersApi , InvestorNamesApi } from "@/Apis/Api";
 interface AddAnimalDialogProps {
   onAddAnimal: (animal: any) => void;
 }
 
 export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
   const [open, setOpen] = useState(false);
+  const [investors, setInvestors] = useState([]);
+  const [farms, setFarms] = useState([]);
   const [formData, setFormData] = useState({
     tag: "",
     srNo: "",
@@ -33,6 +35,39 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
     status: "Active"
   });
   const { toast } = useToast();
+
+
+
+ useEffect(() => {
+    const fetchFarms = async () => {
+      try {
+        const data = await FarmNumbersApi();
+        setFarms(data);
+      } catch (error) {
+        console.error("Failed to fetch farm numbers:", error);
+      }
+    };
+
+  
+
+    fetchFarms();
+  }, []);
+
+
+  useEffect(() => {
+  const fetchFarmsAndInvestors = async () => {
+    try {
+      const farmData = await FarmNumbersApi();
+      const investorData = await InvestorNamesApi();
+      setFarms(farmData);
+      setInvestors(investorData);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
+  fetchFarmsAndInvestors();
+}, []);
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -255,19 +290,26 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">Assignment</h3>
             <div className="grid grid-cols-2 gap-4">
+              
               <div>
-                <Label htmlFor="farm">Assigned Farm *</Label>
-                <Select value={formData.farm} onValueChange={(value) => setFormData({...formData, farm: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Farm" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Farm A">Farm A</SelectItem>
-                    <SelectItem value="Farm B">Farm B</SelectItem>
-                    <SelectItem value="Farm C">Farm C</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+  <Label htmlFor="farm">Assigned Farm *</Label>
+  <Select
+    value={formData.farm}
+    onValueChange={(value) => setFormData({ ...formData, farm: value })}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select Farm" />
+    </SelectTrigger>
+    <SelectContent>
+      {farms.map((farm: { farm_number: string }) => (
+        <SelectItem key={farm.farm_number} value={farm.farm_number}>
+          {farm.farm_number}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
               <div>
                 <Label htmlFor="pen">Assigned Pen *</Label>
                 <Input
@@ -281,13 +323,22 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="investor">Assigned Investor</Label>
-                <Input
-                  id="investor"
-                  value={formData.investor}
-                  onChange={(e) => setFormData({...formData, investor: e.target.value})}
-                  placeholder="John Smith"
-                />
+               <Label htmlFor="investor">Assigned Investor</Label>
+<Select
+  value={formData.investor}
+  onValueChange={(value) => setFormData({ ...formData, investor: value })}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Select Investor" />
+  </SelectTrigger>
+  <SelectContent>
+    {investors.map((inv: { name: string }) => (
+      <SelectItem key={inv.name} value={inv.name}>
+        {inv.name}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
               </div>
               <div>
                 <Label htmlFor="doctor">Assigned Doctor</Label>
