@@ -35,7 +35,24 @@ const db = require("../config/db");
   }
 }; 
 
+const GetAllAnimals = async (req, res) => {
+  try {
+    const query = "SELECT * FROM animals";
+    db.execute(query, (err, results) => {
+      if (err) {
+        console.error("Error fetching animals:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
+      res.status(200).json(results);
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 module.exports = {
-  registerAnimal
+  registerAnimal,
+  GetAllAnimals
 };
