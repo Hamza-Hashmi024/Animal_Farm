@@ -1,13 +1,28 @@
-
-import { useState , useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AnimalRegistrationApi , FarmNumbersApi , InvestorNamesApi } from "@/Apis/Api";
+import {
+  AnimalRegistrationApi,
+  FarmNumbersApi,
+  InvestorNamesApi,
+} from "@/Apis/Api";
 interface AddAnimalDialogProps {
   onAddAnimal: (animal: any) => void;
 }
@@ -32,13 +47,11 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
     pen: "",
     investor: "",
     doctor: "",
-    status: "Active"
+    status: "Active",
   });
   const { toast } = useToast();
 
-
-
- useEffect(() => {
+  useEffect(() => {
     const fetchFarms = async () => {
       try {
         const data = await FarmNumbersApi();
@@ -48,98 +61,102 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       }
     };
 
-  
-
     fetchFarms();
   }, []);
 
-
   useEffect(() => {
-  const fetchFarmsAndInvestors = async () => {
+    const fetchFarmsAndInvestors = async () => {
+      try {
+        const farmData = await FarmNumbersApi();
+        const investorData = await InvestorNamesApi();
+        setFarms(farmData);
+        setInvestors(investorData);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchFarmsAndInvestors();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !formData.tag ||
+      !formData.srNo ||
+      !formData.breed ||
+      !formData.arrivalWeight ||
+      !formData.purchaseDate ||
+      !formData.price ||
+      !formData.farm ||
+      !formData.pen
+    ) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newAnimal = {
+      tag: formData.tag,
+      srNo: formData.srNo,
+      breed: formData.breed,
+      coatColor: formData.coatColor,
+      age: parseInt(formData.age) || 0,
+      weight: parseFloat(formData.arrivalWeight),
+      arrivalWeight: parseFloat(formData.arrivalWeight),
+      purchaseDate: formData.purchaseDate,
+      price: parseFloat(formData.price),
+      ratePerKg: parseFloat(formData.ratePerKg) || 0,
+      mandi: formData.mandi,
+      purchaser: formData.purchaser,
+      farm: formData.farm,
+      pen: formData.pen,
+      investor: formData.investor || undefined,
+      doctor: formData.doctor,
+      status: formData.status,
+      adg: 0,
+    };
+
     try {
-      const farmData = await FarmNumbersApi();
-      const investorData = await InvestorNamesApi();
-      setFarms(farmData);
-      setInvestors(investorData);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
+      const result = await AnimalRegistrationApi(newAnimal);
+      onAddAnimal(result); // Optional: Update parent state if needed
+
+      setFormData({
+        tag: "",
+        srNo: "",
+        breed: "",
+        coatColor: "",
+        age: "",
+        arrivalWeight: "",
+        purchaseDate: "",
+        price: "",
+        ratePerKg: "",
+        mandi: "",
+        purchaser: "",
+        farm: "",
+        pen: "",
+        investor: "",
+        doctor: "",
+        status: "Active",
+      });
+      setOpen(false);
+
+      toast({
+        title: "Success",
+        description: "Animal registered successfully",
+      });
+    } catch (err) {
+      toast({
+        title: "API Error",
+        description: "Failed to register animal",
+        variant: "destructive",
+      });
     }
   };
-
-  fetchFarmsAndInvestors();
-}, []);
-
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  if (!formData.tag || !formData.srNo || !formData.breed || !formData.arrivalWeight || 
-      !formData.purchaseDate || !formData.price || !formData.farm || !formData.pen) {
-    toast({
-      title: "Error",
-      description: "Please fill in all required fields",
-      variant: "destructive"
-    });
-    return;
-  }
-
-  const newAnimal = {
-    tag: formData.tag,
-    srNo: formData.srNo,
-    breed: formData.breed,
-    coatColor: formData.coatColor,
-    age: parseInt(formData.age) || 0,
-    weight: parseFloat(formData.arrivalWeight),
-    arrivalWeight: parseFloat(formData.arrivalWeight),
-    purchaseDate: formData.purchaseDate,
-    price: parseFloat(formData.price),
-    ratePerKg: parseFloat(formData.ratePerKg) || 0,
-    mandi: formData.mandi,
-    purchaser: formData.purchaser,
-    farm: formData.farm,
-    pen: formData.pen,
-    investor: formData.investor || undefined,
-    doctor: formData.doctor,
-    status: formData.status,
-    adg: 0
-  };
-
-  try {
-    const result = await AnimalRegistrationApi(newAnimal);
-    onAddAnimal(result); // Optional: Update parent state if needed
-
-    setFormData({
-      tag: "",
-      srNo: "",
-      breed: "",
-      coatColor: "",
-      age: "",
-      arrivalWeight: "",
-      purchaseDate: "",
-      price: "",
-      ratePerKg: "",
-      mandi: "",
-      purchaser: "",
-      farm: "",
-      pen: "",
-      investor: "",
-      doctor: "",
-      status: "Active"
-    });
-    setOpen(false);
-
-    toast({
-      title: "Success",
-      description: "Animal registered successfully"
-    });
-  } catch (err) {
-    toast({
-      title: "API Error",
-      description: "Failed to register animal",
-      variant: "destructive"
-    });
-  }
-};
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -156,14 +173,18 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Identification */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">Identification</h3>
+            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">
+              Identification
+            </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="tag">Tag Number *</Label>
                 <Input
                   id="tag"
                   value={formData.tag}
-                  onChange={(e) => setFormData({...formData, tag: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, tag: e.target.value })
+                  }
                   placeholder="TAG-001"
                   required
                 />
@@ -173,7 +194,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                 <Input
                   id="srNo"
                   value={formData.srNo}
-                  onChange={(e) => setFormData({...formData, srNo: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, srNo: e.target.value })
+                  }
                   placeholder="001"
                   required
                 />
@@ -183,14 +206,18 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
 
           {/* Physical Details */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">Physical Details</h3>
+            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">
+              Physical Details
+            </h3>
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="breed">Breed *</Label>
                 <Input
                   id="breed"
                   value={formData.breed}
-                  onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, breed: e.target.value })
+                  }
                   placeholder="Holstein"
                   required
                 />
@@ -200,7 +227,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                 <Input
                   id="coatColor"
                   value={formData.coatColor}
-                  onChange={(e) => setFormData({...formData, coatColor: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, coatColor: e.target.value })
+                  }
                   placeholder="Black & White"
                 />
               </div>
@@ -210,7 +239,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   id="age"
                   type="number"
                   value={formData.age}
-                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, age: e.target.value })
+                  }
                   placeholder="12"
                 />
               </div>
@@ -219,7 +250,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
 
           {/* Purchase Details */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">Purchase Details</h3>
+            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">
+              Purchase Details
+            </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="arrivalWeight">Arrival Weight (kg) *</Label>
@@ -227,7 +260,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   id="arrivalWeight"
                   type="number"
                   value={formData.arrivalWeight}
-                  onChange={(e) => setFormData({...formData, arrivalWeight: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, arrivalWeight: e.target.value })
+                  }
                   placeholder="450"
                   required
                 />
@@ -238,7 +273,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   id="purchaseDate"
                   type="date"
                   value={formData.purchaseDate}
-                  onChange={(e) => setFormData({...formData, purchaseDate: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, purchaseDate: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -250,7 +287,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   id="price"
                   type="number"
                   value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
                   placeholder="50000"
                   required
                 />
@@ -261,7 +300,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   id="ratePerKg"
                   type="number"
                   value={formData.ratePerKg}
-                  onChange={(e) => setFormData({...formData, ratePerKg: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, ratePerKg: e.target.value })
+                  }
                   placeholder="120"
                 />
               </div>
@@ -270,7 +311,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                 <Input
                   id="mandi"
                   value={formData.mandi}
-                  onChange={(e) => setFormData({...formData, mandi: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mandi: e.target.value })
+                  }
                   placeholder="Central Market"
                 />
               </div>
@@ -280,7 +323,9 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
               <Input
                 id="purchaser"
                 value={formData.purchaser}
-                onChange={(e) => setFormData({...formData, purchaser: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, purchaser: e.target.value })
+                }
                 placeholder="John Doe"
               />
             </div>
@@ -288,34 +333,42 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
 
           {/* Assignment */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">Assignment</h3>
+            <h3 className="font-semibold text-sm text-gray-700 border-b pb-1">
+              Assignment
+            </h3>
             <div className="grid grid-cols-2 gap-4">
-              
               <div>
-  <Label htmlFor="farm">Assigned Farm *</Label>
-  <Select
-    value={formData.farm}
-    onValueChange={(value) => setFormData({ ...formData, farm: value })}
-  >
-    <SelectTrigger>
-      <SelectValue placeholder="Select Farm" />
-    </SelectTrigger>
-    <SelectContent>
-      {farms.map((farm: { farm_number: string }) => (
-        <SelectItem key={farm.farm_number} value={farm.farm_number}>
-          {farm.farm_number}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-</div>
+                <Label htmlFor="farm">Assigned Farm *</Label>
+                <Select
+                  value={formData.farm}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, farm: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Farm" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {farms.map((farm: { farm_number: string }) => (
+                      <SelectItem
+                        key={farm.farm_number}
+                        value={farm.farm_number}
+                      >
+                        {farm.farm_number}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               <div>
                 <Label htmlFor="pen">Assigned Pen *</Label>
                 <Input
                   id="pen"
                   value={formData.pen}
-                  onChange={(e) => setFormData({...formData, pen: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, pen: e.target.value })
+                  }
                   placeholder="Pen 1"
                   required
                 />
@@ -323,29 +376,33 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-               <Label htmlFor="investor">Assigned Investor</Label>
-<Select
-  value={formData.investor}
-  onValueChange={(value) => setFormData({ ...formData, investor: value })}
->
-  <SelectTrigger>
-    <SelectValue placeholder="Select Investor" />
-  </SelectTrigger>
-  <SelectContent>
-    {investors.map((inv: { name: string }) => (
-      <SelectItem key={inv.name} value={inv.name}>
-        {inv.name}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
+                <Label htmlFor="investor">Assigned Investor</Label>
+                <Select
+                  value={formData.investor}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, investor: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Investor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {investors.map((inv: { name: string }) => (
+                      <SelectItem key={inv.name} value={inv.name}>
+                        {inv.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="doctor">Assigned Doctor</Label>
                 <Input
                   id="doctor"
                   value={formData.doctor}
-                  onChange={(e) => setFormData({...formData, doctor: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, doctor: e.target.value })
+                  }
                   placeholder="Dr. Johnson"
                 />
               </div>
@@ -354,7 +411,12 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
 
           <div>
             <Label htmlFor="status">Status</Label>
-            <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+            <Select
+              value={formData.status}
+              onValueChange={(value) =>
+                setFormData({ ...formData, status: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -367,7 +429,11 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" className="bg-green-600 hover:bg-green-700">
