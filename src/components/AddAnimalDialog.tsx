@@ -100,26 +100,24 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       return;
     }
 
-    const newAnimal = {
-      tag: formData.tag,
-      srNo: formData.srNo,
-      breed: formData.breed,
-      coatColor: formData.coatColor,
-      age: parseInt(formData.age) || 0,
-      weight: parseFloat(formData.arrivalWeight),
-      arrivalWeight: parseFloat(formData.arrivalWeight),
-      purchaseDate: formData.purchaseDate,
-      price: parseFloat(formData.price),
-      ratePerKg: parseFloat(formData.ratePerKg) || 0,
-      mandi: formData.mandi,
-      purchaser: formData.purchaser,
-      farm: formData.farm,
-      pen: formData.pen,
-      investor: formData.investor || undefined,
-      doctor: formData.doctor,
-      status: formData.status,
-      adg: 0,
-    };
+const newAnimal = {
+  tag: formData.tag,
+  srNo: formData.srNo,
+  breed: formData.breed,
+  coatColor: formData.coatColor || null,
+  age: parseInt(formData.age) || 0,
+  arrivalWeight: parseFloat(formData.arrivalWeight),
+  purchaseDate: formData.purchaseDate,
+  price: parseFloat(formData.price),
+  ratePerKg: parseFloat(formData.ratePerKg) || 0,
+  mandi: formData.mandi || null,
+  purchaser: formData.purchaser || null,
+  farm: formData.farm,
+  pen: formData.pen,
+  investor: formData.investor || null,
+  doctor: formData.doctor || null,
+  status: formData.status || "Active"
+};
 
     try {
       const result = await AnimalRegistrationApi(newAnimal);
