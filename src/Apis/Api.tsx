@@ -70,3 +70,16 @@ export const AnimalListApi = async () => {
     throw err;
   }
 };
+
+export const  GetAnimalWithcheckPoints = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/with-checkpoints`);
+    console.log("AnimalsWithCheckpointsApi response:", response.data);
+    return response.data;
+
+  }
+  catch (err) {
+    console.error("Error in AnimalsWithCheckpointsApi:", err);
+    throw err;
+  }
+}

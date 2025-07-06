@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,15 @@ import { AnimalCard } from "@/components/AnimalCard";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkpoint } from "@/types/checkpoint";
+import { GetAnimalWithcheckPoints } from "@/Apis/Api";
 
 const WeightsVaccination = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("overdue");
   const { toast } = useToast();
+  const [animals, setAnimals] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
 
   // Helper function to create realistic checkpoint schedule for 2025
   const createCheckpointSchedule = (animalTag: string, targetStatus: 'overdue' | 'due-today' | 'due-tomorrow', targetDay: number) => {
@@ -104,218 +108,6 @@ const WeightsVaccination = () => {
     return { checkpoints, arrivalDate: arrivalDateStr };
   };
 
-  // Mock data with CORRECTED 2025 dates and Pakistani names
-  const [animals, setAnimals] = useState(() => {
-    const animalsData = [
-      // Overdue animals - each has ONLY ONE overdue checkpoint
-      { 
-        tag: "TAG-001", 
-        srNo: "001",
-        breed: "Holstein", 
-        coatColor: "Black & White",
-        age: 18,
-        weight: 450, 
-        arrivalWeight: 400,
-        adg: 1.3, 
-        status: "Active", 
-        farm: "Farm A", 
-        pen: "Pen 3", 
-        investor: "Muhammad Ali Khan",
-        doctor: "Dr. Ahmed Hassan",
-        price: 45000,
-        ratePerKg: 112.5,
-        mandi: "Central Market",
-        purchaser: "Farm Manager",
-        targetStatus: 'overdue' as const,
-        targetDay: 21
-      },
-      { 
-        tag: "TAG-004", 
-        srNo: "004",
-        breed: "Jersey", 
-        coatColor: "Brown",
-        age: 16,
-        weight: 320, 
-        arrivalWeight: 290,
-        adg: 1.0, 
-        status: "Active", 
-        farm: "Farm C", 
-        pen: "Pen 1", 
-        investor: "Fatima Sheikh",
-        doctor: "Dr. Zafar Iqbal",
-        price: 32000,
-        ratePerKg: 110,
-        mandi: "Local Market",
-        purchaser: "Farm Manager",
-        targetStatus: 'overdue' as const,
-        targetDay: 7
-      },
-      { 
-        tag: "TAG-007", 
-        srNo: "007",
-        breed: "Simmental", 
-        coatColor: "Red & White",
-        age: 20,
-        weight: 520, 
-        arrivalWeight: 480,
-        adg: 1.4, 
-        status: "Active", 
-        farm: "Farm B", 
-        pen: "Pen 4", 
-        investor: "Asad Rahman",
-        doctor: "Dr. Sana Malik",
-        price: 52000,
-        ratePerKg: 108,
-        mandi: "Premium Market",
-        purchaser: "Hassan Ahmed",
-        targetStatus: 'overdue' as const,
-        targetDay: 3
-      },
-      // Due today animals - each has ONLY ONE checkpoint due today
-      { 
-        tag: "TAG-002", 
-        srNo: "002",
-        breed: "Angus", 
-        coatColor: "Black",
-        age: 15,
-        weight: 387, 
-        arrivalWeight: 350,
-        adg: 1.1, 
-        status: "Active", 
-        farm: "Farm B", 
-        pen: "Pen 1", 
-        investor: "Zainab Hussain",
-        doctor: "Dr. Tariq Mahmood",
-        price: 38500,
-        ratePerKg: 110,
-        mandi: "Livestock Market",
-        purchaser: "Hassan Ahmed",
-        targetStatus: 'due-today' as const,
-        targetDay: 21
-      },
-      { 
-        tag: "TAG-005", 
-        srNo: "005",
-        breed: "Charolais", 
-        coatColor: "Cream",
-        age: 14,
-        weight: 395, 
-        arrivalWeight: 360,
-        adg: 1.2, 
-        status: "Active", 
-        farm: "Farm A", 
-        pen: "Pen 5", 
-        investor: "Usman Malik",
-        doctor: "Dr. Ahmed Hassan",
-        price: 39500,
-        ratePerKg: 109,
-        mandi: "Central Market",
-        purchaser: "Farm Manager",
-        targetStatus: 'due-today' as const,
-        targetDay: 3
-      },
-      { 
-        tag: "TAG-008", 
-        srNo: "008",
-        breed: "Limousin", 
-        coatColor: "Golden",
-        age: 17,
-        weight: 430, 
-        arrivalWeight: 400,
-        adg: 1.0, 
-        status: "Active", 
-        farm: "Farm C", 
-        pen: "Pen 2", 
-        investor: "Khadija Awan",
-        doctor: "Dr. Zafar Iqbal",
-        price: 43000,
-        ratePerKg: 107,
-        mandi: "Regional Market",
-        purchaser: "Hassan Ahmed",
-        targetStatus: 'due-today' as const,
-        targetDay: 50
-      },
-      // Due tomorrow animals - each has ONLY ONE checkpoint due tomorrow
-      { 
-        tag: "TAG-003", 
-        srNo: "003",
-        breed: "Hereford", 
-        coatColor: "Red & White",
-        age: 12,
-        weight: 298, 
-        arrivalWeight: 280,
-        adg: 0.9, 
-        status: "Active", 
-        farm: "Farm A", 
-        pen: "Pen 2",
-        doctor: "Dr. Ahmed Hassan",
-        price: 30800,
-        ratePerKg: 110,
-        mandi: "Regional Market",
-        purchaser: "Farm Manager",
-        targetStatus: 'due-tomorrow' as const,
-        targetDay: 7
-      },
-      { 
-        tag: "TAG-006", 
-        srNo: "006",
-        breed: "Brahman", 
-        coatColor: "Gray",
-        age: 19,
-        weight: 465, 
-        arrivalWeight: 430,
-        adg: 1.1, 
-        status: "Active", 
-        farm: "Farm B", 
-        pen: "Pen 3", 
-        investor: "Naveed Siddiqui",
-        doctor: "Dr. Sana Malik",
-        price: 46500,
-        ratePerKg: 108,
-        mandi: "Livestock Market",
-        purchaser: "Hassan Ahmed",
-        targetStatus: 'due-tomorrow' as const,
-        targetDay: 21
-      },
-      { 
-        tag: "TAG-009", 
-        srNo: "009",
-        breed: "Shorthorn", 
-        coatColor: "Roan",
-        age: 13,
-        weight: 310, 
-        arrivalWeight: 285,
-        adg: 0.8, 
-        status: "Active", 
-        farm: "Farm C", 
-        pen: "Pen 6", 
-        investor: "Ayesha Nasir",
-        doctor: "Dr. Zafar Iqbal",
-        price: 31000,
-        ratePerKg: 109,
-        mandi: "Local Market",
-        purchaser: "Farm Manager",
-        targetStatus: 'due-tomorrow' as const,
-        targetDay: 3
-      }
-    ];
-
-    // Generate checkpoints and arrival dates for each animal
-    return animalsData.map(animal => {
-      const { checkpoints, arrivalDate } = createCheckpointSchedule(
-        animal.tag, 
-        animal.targetStatus, 
-        animal.targetDay
-      );
-      
-      return {
-        ...animal,
-        arrivalDate,
-        purchaseDate: arrivalDate,
-        checkpoints
-      };
-    });
-  });
 
   // Helper function to get status counts based on checkpoints
   const getStatusCounts = () => {
@@ -378,6 +170,48 @@ const WeightsVaccination = () => {
   };
 
   const { overdue, dueToday, dueTomorrow } = getStatusCounts();
+
+
+
+useEffect(() => {
+  const fetchAnimals = async () => {
+    try {
+      const data = await GetAnimalWithcheckPoints();
+
+      const formattedData = data.map(animal => ({
+        ...animal,
+        checkpoints: animal.checkpoints.map(cp => ({
+          id: `cp-${cp.checkpoint_id}`,
+          animalTag: animal.tag,
+          day: cp.day_offset ?? 0,
+          name: cp.checkpoint_label,
+          scheduledDate: cp.scheduled_date?.split('T')[0],
+          completed: !!cp.completed_at,
+          actualDate: cp.check_date ?? undefined,
+          weight: cp.weight_kg ?? undefined,
+          vaccine: cp.record_notes?.includes("vaccine") ? {
+            name: "Example Vaccine",
+            batch: "BATCH-001",
+            dose: "2ml"
+          } : undefined,
+          dewormer: cp.record_notes?.includes("deworm") ? {
+            name: "Ivermectin",
+            dose: "10ml"
+          } : undefined,
+          notes: cp.record_notes ?? ""
+        }))
+      }));
+
+      setAnimals(formattedData);
+    } catch (err) {
+      setError("Failed to load animal data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAnimals();
+}, []);
 
   return (
     <SidebarProvider>

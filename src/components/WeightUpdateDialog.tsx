@@ -20,7 +20,8 @@ export function WeightUpdateDialog({
   currentWeight,
   onWeightUpdate
 }: WeightUpdateDialogProps) {
-  const [newWeight, setNewWeight] = useState(currentWeight.toString());
+  const [newWeight, setNewWeight] = useState((currentWeight ?? 0).toString());
+
   const { toast } = useToast();
 
   const handleSave = () => {
