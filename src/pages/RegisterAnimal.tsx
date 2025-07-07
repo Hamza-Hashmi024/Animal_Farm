@@ -40,9 +40,11 @@ const RegisterAnimal = () => {
               <CardHeader>
                 <CardTitle>Animal Registration Form</CardTitle>
               </CardHeader>
-              <CardContent className="flex justify-center py-8">
-                <AddAnimalDialog onAddAnimal={handleAddAnimal} />
-              </CardContent>
+              <CardContent className="flex justify-center gap-4 py-8">
+  <AddAnimalDialog onAddAnimal={handleAddAnimal} />
+  <AddAnimalDialog onAddAnimal={handleAddAnimal} />
+</CardContent>
+            
             </Card>
 
             {/* Instructions */}
