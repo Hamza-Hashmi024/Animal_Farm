@@ -362,9 +362,39 @@ const createCheckpointRecord = async (req, res) => {
 
 
 
+// rEGISTER bREAD 
+
+const registerBreed = (req, res) => {
+  const { name, description } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: "Breed name is required" });
+  } else if (!description) {
+    return res.status(400).json({ error: "Breed description is required" });
+  }
+
+  const query = "INSERT INTO breeds (name, description) VALUES (?, ?)";
+  const values = [name, description];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error registering breed:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    res.status(201).json({
+      message: "Breed registered successfully",
+      breedId: result.insertId,
+    });
+  });
+};
+
+
+
 module.exports = {
   registerAnimal,
   GetAllAnimals,
   getAnimalsWithCheckpoints,
   createCheckpointRecord,
+  registerBreed
 };
