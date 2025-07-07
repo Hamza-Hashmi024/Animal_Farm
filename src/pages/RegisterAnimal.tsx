@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { AddAnimalDialog } from "@/components/AddAnimalDialog";
 import { useToast } from "@/hooks/use-toast";
+import { AddBreedDialog } from "@/components/AddBreedDialog";
 
 const RegisterAnimal = () => {
   const { toast } = useToast();
@@ -16,6 +17,14 @@ const RegisterAnimal = () => {
     toast({
       title: "Animal Registered",
       description: `Animal ${newAnimal.tag} has been successfully registered.`
+    });
+  };
+
+  const handleAddBreed = (newBreed: any) => {
+    console.log("New breed registered:", newBreed);
+    toast({
+      title: "Breed Registered",
+      description: `Breed ${newBreed.name} has been successfully registered.`
     });
   };
 
@@ -42,7 +51,7 @@ const RegisterAnimal = () => {
               </CardHeader>
               <CardContent className="flex justify-center gap-4 py-8">
   <AddAnimalDialog onAddAnimal={handleAddAnimal} />
-  <AddAnimalDialog onAddAnimal={handleAddAnimal} />
+  <AddBreedDialog onBreedAdded={ handleAddBreed} />
 </CardContent>
             
             </Card>
