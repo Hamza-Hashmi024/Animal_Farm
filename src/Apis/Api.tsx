@@ -71,26 +71,25 @@ export const AnimalListApi = async () => {
   }
 };
 
-export const  GetAnimalWithcheckPoints = async () => {
+export const GetAnimalWithcheckPoints = async () => {
   try {
     const response = await axios.get(`${Base_Url}/api/with-checkpoints`);
     console.log("AnimalsWithCheckpointsApi response:", response.data);
     return response.data;
-
-  }
-  catch (err) {
+  } catch (err) {
     console.error("Error in AnimalsWithCheckpointsApi:", err);
     throw err;
   }
-}
-
+};
 
 export const CreateCheckpointRecord = async (checkpointId, data) => {
   try {
-  
     const numericId = checkpointId.toString().replace("cp-", "");
 
-    const response = await axios.post(`${Base_Url}/api/checkpoints/${numericId}/record`, data);
+    const response = await axios.post(
+      `${Base_Url}/api/checkpoints/${numericId}/record`,
+      data
+    );
     console.log("CreateCheckpointRecord response:", response.data);
     return response.data;
   } catch (err) {
@@ -104,21 +103,19 @@ export const RegisterBreedApi = async (data) => {
     const response = await axios.post(`${Base_Url}/api/breeds/register`, data);
     console.log("RegisterBreedApi response:", response.data);
     return response.data;
-  }
-  catch (err) {
+  } catch (err) {
     console.error("Error in RegisterBreedApi:", err);
     throw err;
   }
-
-}
+};
 
 export const GetAllBreedsApi = async () => {
   try {
     const response = await axios.get(`${Base_Url}/api/breeds`);
     console.log("GetAllBreedsApi response:", response.data);
     return response.data;
-  }catch (err){
+  } catch (err) {
     console.error("Error in GetAllBreedsApi:", err);
     throw err;
   }
-}
+};

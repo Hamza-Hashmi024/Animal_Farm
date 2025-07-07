@@ -48,7 +48,7 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
     pen: "",
     investor: "",
     doctor: "",
-    status: "Active",
+
   });
   const [breeds, setBreeds] = useState([]);
   const { toast } = useToast();
@@ -150,7 +150,7 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       pen: formData.pen,
       investor: formData.investor || null,
       doctor: formData.doctor || null,
-      status: formData.status || "Active",
+      
     };
 
     try {
@@ -449,24 +449,7 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) =>
-                setFormData({ ...formData, status: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Quarantine">Quarantine</SelectItem>
-                <SelectItem value="Transferred">Transferred</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+         
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button
