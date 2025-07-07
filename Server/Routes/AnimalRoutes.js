@@ -5,6 +5,6 @@ const { registerAnimal, GetAllAnimals , getAnimalsWithCheckpoints  ,  createChec
 router.post('/animals/register', registerAnimal);
 router.get('/animals', GetAllAnimals);
 router.get("/with-checkpoints", getAnimalsWithCheckpoints);
-router.post("/api/checkpoints/:checkpointId/record", createCheckpointRecord);
+router.post("/checkpoints/:checkpointId/record", createCheckpointRecord);
 
 module.exports = router;

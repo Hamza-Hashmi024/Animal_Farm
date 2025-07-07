@@ -165,40 +165,198 @@ const getAnimalsWithCheckpoints = async (req, res) => {
 };
 
 // tHIS cHUNK oF CODE uPDATEING uPDATED wEIGHT OF aNIMAL 
-const   createCheckpointRecord = async (req, res) => {
+// const createCheckpointRecord = async (req, res) => {
+//   const { checkpointId } = req.params;
+//   const {
+//     check_date,
+//     weight_kg,
+//     notes,
+//     vaccine,
+//     dewormer,
+//     medicines = []
+//   } = req.body;
+
+//   if (!check_date) {
+//     return res.status(400).json({ error: "Check date is required" });
+//   }
+
+//   const connection = await db.getConnection();
+
+//   try {
+//     await connection.beginTransaction();
+
+//     // 1. Insert into checkpoint_records
+//     const [recordResult] = await connection.query(
+//       `INSERT INTO checkpoint_records (checkpoint_id, check_date, weight_kg, notes)
+//        VALUES (?, ?, ?, ?)`,
+//       [checkpointId, check_date, weight_kg || null, notes || null]
+//     );
+
+//     const recordId = recordResult.insertId;
+
+//     // 2. Update animal_checkpoints with completion
+//     await connection.query(
+//       `UPDATE animal_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
+//       [recordId, checkpointId]
+//     );
+
+//     // 3. Build treatments
+//     const treatments = [];
+
+//     if (vaccine?.name) {
+//       treatments.push([
+//         recordId,
+//         'vaccine',
+//         vaccine.name,
+//         vaccine.batch || null,
+//         vaccine.dose || null,
+//         null
+//       ]);
+//     }
+
+//     if (dewormer?.name) {
+//       treatments.push([
+//         recordId,
+//         'dewormer',
+//         dewormer.name,
+//         null,
+//         dewormer.dose || null,
+//         null
+//       ]);
+//     }
+
+//     if (Array.isArray(medicines)) {
+//       for (const med of medicines) {
+//         if (med.name) {
+//           treatments.push([
+//             recordId,
+//             'medicine',
+//             med.name,
+//             null,
+//             med.dose || null,
+//             null
+//           ]);
+//         }
+//       }
+//     }
+
+//     // 4. Insert treatments if any
+//     if (treatments.length > 0) {
+//       await connection.query(
+//         `INSERT INTO treatments (record_id, category, name, batch_no, dose, notes) VALUES ?`,
+//         [treatments]
+//       );
+//     }
+
+//     await connection.commit();
+
+//     res.status(201).json({
+//       message: "Checkpoint record and treatments saved",
+//       recordId
+//     });
+
+//   } catch (err) {
+//     await connection.rollback();
+//     console.error(" Error in createCheckpointRecord:", err.message);
+//     res.status(500).json({ error: "Failed to save checkpoint record" });
+//   } finally {
+//     connection.release(); 
+//   }
+// };
+
+const createCheckpointRecord = async (req, res) => {
   const { checkpointId } = req.params;
-  const { check_date, weight_kg, notes } = req.body;
+  const {
+    check_date,
+    weight_kg,
+    notes,
+    vaccine,
+    dewormer,
+    medicines = []
+  } = req.body;
 
   if (!check_date) {
     return res.status(400).json({ error: "Check date is required" });
   }
 
+  const dbPromise = db.promise();
+
   try {
-    // 1. Insert record
-    const [result] = await db
-      .promise()
-      .query(
-        `INSERT INTO checkpoint_records (checkpoint_id, check_date, weight_kg, notes) VALUES (?, ?, ?, ?)`,
-        [checkpointId, check_date, weight_kg || null, notes || null]
-      );
+    await dbPromise.query('START TRANSACTION');
 
-    const recordId = result.insertId;
+    // 1. Insert into checkpoint_records
+    const [recordResult] = await dbPromise.query(
+      `INSERT INTO checkpoint_records (checkpoint_id, check_date, weight_kg, notes)
+       VALUES (?, ?, ?, ?)`,
+      [checkpointId, check_date, weight_kg || null, notes || null]
+    );
 
-    // 2. Update checkpoint's completed_at field (if needed)
-    await db
-      .promise()
-      .query(
-        `UPDATE animal_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
-        [recordId, checkpointId]
+    const recordId = recordResult.insertId;
+
+    // 2. Update scheduled_checkpoints with record info
+    await dbPromise.query(
+      `UPDATE scheduled_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
+      [recordId, checkpointId]
+    );
+
+    // 3. Prepare treatments
+    const treatments = [];
+
+    if (vaccine?.name) {
+      treatments.push([
+        recordId,
+        'vaccine',
+        vaccine.name,
+        vaccine.batch || null,
+        vaccine.dose || null,
+        null
+      ]);
+    }
+
+    if (dewormer?.name) {
+      treatments.push([
+        recordId,
+        'dewormer',
+        dewormer.name,
+        null,
+        dewormer.dose || null,
+        null
+      ]);
+    }
+
+    for (const med of medicines) {
+      if (med.name) {
+        treatments.push([
+          recordId,
+          'medicine',
+          med.name,
+          null,
+          med.dose || null,
+          null
+        ]);
+      }
+    }
+
+    // 4. Insert treatments
+    if (treatments.length > 0) {
+      await dbPromise.query(
+        `INSERT INTO treatments (record_id, category, name, batch_no, dose, notes) VALUES ?`,
+        [treatments]
       );
+    }
+
+    // 5. Commit transaction
+    await dbPromise.query('COMMIT');
 
     res.status(201).json({
-      message: "Checkpoint record created",
-      recordId,
+      message: "Checkpoint record and treatments saved",
+      recordId
     });
+
   } catch (err) {
-    console.error("Error creating checkpoint record:", err);
-    res.status(500).json({ error: "Failed to create checkpoint record" });
+    await dbPromise.query('ROLLBACK');
+    console.error("Error in createCheckpointRecord:", err.message);
+    res.status(500).json({ error: "Failed to save checkpoint record" });
   }
 };
 

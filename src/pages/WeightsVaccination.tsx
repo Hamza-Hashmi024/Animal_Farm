@@ -13,194 +13,123 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkpoint } from "@/types/checkpoint";
 import { GetAnimalWithcheckPoints } from "@/Apis/Api";
 
+
 const WeightsVaccination = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("overdue");
-  const { toast } = useToast();
   const [animals, setAnimals] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { toast } = useToast();
 
-  // Helper function to create realistic checkpoint schedule for 2025
-  const createCheckpointSchedule = (animalTag: string, targetStatus: 'overdue' | 'due-today' | 'due-tomorrow', targetDay: number) => {
-    const today = new Date('2025-06-30'); // Today is June 30th, 2025
-    const todayStr = today.toISOString().split('T')[0];
-    const tomorrow = new Date('2025-07-01');
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-    
-    // Calculate arrival date based on target checkpoint and status
-    let targetDate: Date;
-    if (targetStatus === 'overdue') {
-      targetDate = new Date('2025-06-28'); // Make target checkpoint 2 days overdue
-    } else if (targetStatus === 'due-today') {
-      targetDate = today;
-    } else { // due-tomorrow
-      targetDate = tomorrow;
-    }
-    
-    // Calculate arrival date by subtracting target day from target date
-    const arrivalDate = new Date(targetDate);
-    arrivalDate.setDate(targetDate.getDate() - targetDay);
-    const arrivalDateStr = arrivalDate.toISOString().split('T')[0];
-    
-    const checkpoints: Checkpoint[] = [];
-    const days = [0, 3, 7, 21, 50, 75];
-    const names = ["Arrival", "Day 3 Check", "Day 7 Check", "Day 21 Check", "Day 50 Check", "Day 75 Check"];
-    
-    for (let i = 0; i < days.length; i++) {
-      const day = days[i];
-      const scheduledDate = new Date(arrivalDate);
-      scheduledDate.setDate(arrivalDate.getDate() + day);
-      const scheduledDateStr = scheduledDate.toISOString().split('T')[0];
-      
-      let completed = false;
-      let actualDate = undefined;
-      let weight = undefined;
-      
-      // Day 0 (arrival) is ALWAYS completed
-      if (day === 0) {
-        completed = true;
-        actualDate = arrivalDateStr;
-        weight = 400;
-      }
-      // Complete all checkpoints BEFORE the target day
-      else if (day < targetDay) {
-        completed = true;
-        actualDate = scheduledDateStr;
-        weight = 400 + (day * 10);
-      }
-      // The target day - this is the one that should be overdue/due today/due tomorrow
-      else if (day === targetDay) {
-        completed = false;
-        // scheduledDateStr is already calculated correctly above
-      }
-      // All days AFTER the target day remain upcoming (not completed, future dates)
-      else {
-        completed = false;
-        // Future checkpoints keep their calculated future dates
-      }
-      
-      checkpoints.push({
-        id: `${animalTag}-day-${day}`,
-        animalTag,
-        day,
-        name: names[i],
-        scheduledDate: scheduledDateStr,
-        completed,
-        actualDate,
-        weight,
-        // Add sample data for completed checkpoints only
-        ...(completed && day > 0 ? {
-          vaccine: {
-            name: `Vaccine-${day}`,
-            batch: `BATCH-${day}-2025`,
-            dose: "2ml"
-          },
-          dewormer: {
-            name: "Ivermectin",
-            dose: "10ml"
-          },
-          notes: `Day ${day} check completed successfully. Animal healthy.`
-        } : {})
-      });
-    }
+  // Centralized date (today) for consistency across all logic
+  const today = new Date(); // use current system date
+  const todayStr = today.toISOString().split("T")[0];
+  const tomorrowStr = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-    return { checkpoints, arrivalDate: arrivalDateStr };
-  };
-
-
-  // Helper function to get status counts based on checkpoints
+  // Count checkpoints by status
   const getStatusCounts = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
-    const overdue = animals.filter(animal => 
-      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < today)
+    const overdue = animals.filter(animal =>
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < todayStr)
     ).length;
-    
-    const dueToday = animals.filter(animal => 
-      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === today)
+
+    const dueToday = animals.filter(animal =>
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === todayStr)
     ).length;
-    
-    const dueTomorrow = animals.filter(animal => 
-      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === tomorrow)
+
+    const dueTomorrow = animals.filter(animal =>
+      animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === tomorrowStr)
     ).length;
-    
+
     return { overdue, dueToday, dueTomorrow };
   };
 
-  // Helper function to filter animals based on their checkpoint status
+
+console.log("Today:", todayStr);
+console.log("Animals:", animals);
+
+  // Filter animals based on tab (status)
   const getFilteredAnimals = (status: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
     return animals.filter(animal => {
-      switch (status) {
-        case 'overdue':
-          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate < today);
-        case 'due-today':
-          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === today);
-        case 'due-tomorrow':
-          return animal.checkpoints.some(cp => !cp.completed && cp.scheduledDate === tomorrow);
-        default:
-          return false;
-      }
+      return animal.checkpoints.some(cp => {
+        if (cp.completed) return false;
+        if (status === "overdue") return cp.scheduledDate < todayStr;
+        if (status === "due-today") return cp.scheduledDate === todayStr;
+        if (status === "due-tomorrow") return cp.scheduledDate === tomorrowStr;
+        return false;
+      });
     });
   };
 
   const handleWeightUpdate = (tag: string, newWeight: number) => {
-    setAnimals(prev => prev.map(animal => 
-      animal.tag === tag 
-        ? { ...animal, weight: newWeight }
-        : animal
-    ));
+    setAnimals(prev =>
+      prev.map(animal =>
+        animal.tag === tag ? { ...animal, weight: newWeight } : animal
+      )
+    );
   };
 
   const handleCheckpointUpdate = (animalTag: string, updatedCheckpoint: Checkpoint) => {
-    setAnimals(prev => prev.map(animal => 
-      animal.tag === animalTag 
-        ? { 
-            ...animal, 
-            checkpoints: animal.checkpoints.map(cp => 
-              cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
-            )
-          }
-        : animal
-    ));
+    setAnimals(prev =>
+      prev.map(animal =>
+        animal.tag === animalTag
+          ? {
+              ...animal,
+              checkpoints: animal.checkpoints.map(cp =>
+                cp.id === updatedCheckpoint.id ? updatedCheckpoint : cp
+              )
+            }
+          : animal
+      )
+    );
   };
-
-  const { overdue, dueToday, dueTomorrow } = getStatusCounts();
-
-
 
 useEffect(() => {
   const fetchAnimals = async () => {
     try {
       const data = await GetAnimalWithcheckPoints();
 
-      const formattedData = data.map(animal => ({
-        ...animal,
-        checkpoints: animal.checkpoints.map(cp => ({
-          id: `cp-${cp.checkpoint_id}`,
-          animalTag: animal.tag,
-          day: cp.day_offset ?? 0,
-          name: cp.checkpoint_label,
-          scheduledDate: cp.scheduled_date?.split('T')[0],
-          completed: !!cp.completed_at,
-          actualDate: cp.check_date ?? undefined,
-          weight: cp.weight_kg ?? undefined,
-          vaccine: cp.record_notes?.includes("vaccine") ? {
-            name: "Example Vaccine",
-            batch: "BATCH-001",
-            dose: "2ml"
-          } : undefined,
-          dewormer: cp.record_notes?.includes("deworm") ? {
-            name: "Ivermectin",
-            dose: "10ml"
-          } : undefined,
-          notes: cp.record_notes ?? ""
-        }))
-      }));
+      const formattedData = data.map(animal => {
+        const checkpoints = animal.checkpoints.map(cp => {
+          // Safely extract date string in 'YYYY-MM-DD' format
+          const rawDate = cp.scheduled_date;
+          const scheduledDate = rawDate
+            ? new Date(rawDate).toLocaleDateString("en-CA") // handles timezones better
+            : undefined;
+
+          // Debug log to verify matching
+          console.log(
+            `Animal: ${animal.tag}, Checkpoint: ${cp.checkpoint_label}, Scheduled: ${scheduledDate}, Today: ${today.toLocaleDateString("en-CA")}`
+          );
+
+          return {
+            id: `cp-${cp.checkpoint_id}`,
+            animalTag: animal.tag,
+            day: cp.day_offset ?? 0,
+            name: cp.checkpoint_label,
+            scheduledDate,
+            completed: !!cp.completed_at,
+            actualDate: cp.check_date ?? undefined,
+            weight: cp.weight_kg ?? undefined,
+            vaccine: cp.record_notes?.includes("vaccine")
+              ? {
+                  name: "Example Vaccine",
+                  batch: "BATCH-001",
+                  dose: "2ml"
+                }
+              : undefined,
+            dewormer: cp.record_notes?.includes("deworm")
+              ? {
+                  name: "Ivermectin",
+                  dose: "10ml"
+                }
+              : undefined,
+            notes: cp.record_notes ?? ""
+          };
+        });
+
+        return { ...animal, checkpoints };
+      });
 
       setAnimals(formattedData);
     } catch (err) {
@@ -212,6 +141,9 @@ useEffect(() => {
 
   fetchAnimals();
 }, []);
+
+
+  const { overdue, dueToday, dueTomorrow } = getStatusCounts();
 
   return (
     <SidebarProvider>

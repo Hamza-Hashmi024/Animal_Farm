@@ -83,3 +83,18 @@ export const  GetAnimalWithcheckPoints = async () => {
     throw err;
   }
 }
+
+
+export const CreateCheckpointRecord = async (checkpointId, data) => {
+  try {
+  
+    const numericId = checkpointId.toString().replace("cp-", "");
+
+    const response = await axios.post(`${Base_Url}/api/checkpoints/${numericId}/record`, data);
+    console.log("CreateCheckpointRecord response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error in CreateCheckpointRecord:", err);
+    throw err;
+  }
+};

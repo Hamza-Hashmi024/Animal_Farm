@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Weight, Syringe, Pill, FileText } from "lucide-react";
 import { Checkpoint } from "@/types/checkpoint";
+import { CreateCheckpointRecord } from "@/Apis/Api"; 
 
 interface HealthCheckpointProps {
   checkpoint: Checkpoint;
@@ -42,9 +43,34 @@ export function HealthCheckpoint({ checkpoint, previousWeight, onSave, onCancel,
     }));
   };
 
-  const handleSave = () => {
-    onSave({ ...formData, completed: true });
-  };
+const handleSave = async () => {
+  if (!formData.actualDate || !formData.weight) return;
+
+  try {
+    const payload = {
+      check_date: formData.actualDate,
+      weight_kg: formData.weight,
+      notes: formData.notes,
+      vaccine: formData.vaccine?.name ? formData.vaccine : undefined,
+      dewormer: formData.dewormer?.name ? formData.dewormer : undefined,
+      medicines: formData.medicines?.filter(m => m?.name) || [],
+    };
+
+    const response = await CreateCheckpointRecord(checkpoint.id.replace("cp-", ""), payload);
+
+    // Mark checkpoint as completed on frontend
+    onSave({
+      ...formData,
+      completed: true,
+      actualDate: formData.actualDate,
+      weight: formData.weight,
+    });
+
+  } catch (err) {
+    console.error("Error saving checkpoint:", err);
+    alert("Failed to save checkpoint. Please try again.");
+  }
+};
 
   return (
     <Dialog open={open} onOpenChange={onCancel}>
