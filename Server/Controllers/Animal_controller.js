@@ -373,7 +373,7 @@ const registerBreed = (req, res) => {
     return res.status(400).json({ error: "Breed description is required" });
   }
 
-  const query = "INSERT INTO breeds (name, description) VALUES (?, ?)";
+  const query = "INSERT INTO animal_breeds (name, description) VALUES (?, ?)";
   const values = [name, description];
 
   db.query(query, values, (err, result) => {

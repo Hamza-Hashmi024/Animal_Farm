@@ -98,3 +98,16 @@ export const CreateCheckpointRecord = async (checkpointId, data) => {
     throw err;
   }
 };
+
+export const RegisterBreedApi = async (data) => {
+  try {
+    const response = await axios.post(`${Base_Url}/api/breeds/register`, data);
+    console.log("RegisterBreedApi response:", response.data);
+    return response.data;
+  }
+  catch (err) {
+    console.error("Error in RegisterBreedApi:", err);
+    throw err;
+  }
+
+}
