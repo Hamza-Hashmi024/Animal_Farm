@@ -62,7 +62,7 @@ export const InvestorNamesApi = async () => {
 
 export const AnimalListApi = async () => {
   try {
-    const response = await axios.get(`${Base_Url}/api/animals`);
+    const response = await axios.get(`${Base_Url}/api/`);
     console.log("AnimalListApi response:", response.data);
     return response.data;
   } catch (err) {
@@ -116,6 +116,19 @@ export const GetAllBreedsApi = async () => {
     return response.data;
   } catch (err) {
     console.error("Error in GetAllBreedsApi:", err);
+    throw err;
+  }
+};
+
+export const GetFilteredAnimalsApi = async (filters) => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/animals`, {
+      params: filters,
+    });
+    console.log("GetFilteredAnimalsApi response:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Error in GetFilteredAnimalsApi:", err);
     throw err;
   }
 };

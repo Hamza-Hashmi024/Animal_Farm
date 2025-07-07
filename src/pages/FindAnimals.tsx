@@ -19,7 +19,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { MapPin, Search } from "lucide-react";
-import { AnimalListApi } from "@/Apis/Api";
+import { GetFilteredAnimalsApi ,AnimalListApi, } from "@/Apis/Api";
 
 const FindAnimals = () => {
   const [allAnimals, setAllAnimals] = useState([]);
@@ -31,59 +31,56 @@ const FindAnimals = () => {
   const [farms, setFarms] = useState<string[]>([]);
   const [pens, setPens] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchAnimals = async () => {
-      try {
-        const data = await AnimalListApi();
+useEffect(() => {
+  const fetchAnimalMeta = async () => {
+    try {
+      const data = await AnimalListApi();
 
-        const normalized = data.map((animal) => ({
-          ...animal,
-          weight: parseFloat(animal.arrival_weight || "0"),
-        }));
+      const farmSet = new Set<string>();
+      const penSet = new Set<string>();
 
-        setAllAnimals(normalized);
+      data.forEach((animal) => {
+        if (animal.farm) farmSet.add(animal.farm.trim());
+        if (animal.pen) penSet.add(animal.pen.trim());
+      });
 
-        // Extract unique farms and pens
-        const farmSet = new Set<string>();
-        const penSet = new Set<string>();
-
-        normalized.forEach((animal) => {
-          if (animal.farm) farmSet.add(animal.farm.trim());
-          if (animal.pen) penSet.add(animal.pen.trim());
-        });
-
-        setFarms([...farmSet]);
-        setPens([...penSet]);
-      } catch (error) {
-        console.error("Failed to fetch animals:", error);
-      }
-    };
-
-    fetchAnimals();
-  }, []);
-
-  const handleSearch = () => {
-    const min = minWeight ? parseFloat(minWeight) : 0;
-    const max = maxWeight ? parseFloat(maxWeight) : Infinity;
-
-    const filtered = allAnimals.filter((animal) => {
-      const withinWeightRange = animal.weight >= min && animal.weight <= max;
-      const farmMatch = selectedFarm === "all" || animal.farm === selectedFarm;
-      const penMatch = selectedPen === "all" || animal.pen === selectedPen;
-
-      return withinWeightRange && farmMatch && penMatch;
-    });
-
-    setSearchResults(filtered);
+      setFarms([...farmSet]);
+      setPens([...penSet]);
+    } catch (error) {
+      console.error("Failed to fetch animals metadata:", error);
+    }
   };
 
-  const resetFilters = () => {
-    setMinWeight("");
-    setMaxWeight("");
-    setSelectedFarm("all");
-    setSelectedPen("all");
-    setSearchResults([]);
-  };
+  fetchAnimalMeta();
+}, []);
+
+const handleSearch = async () => {
+  try {
+    const filters = {
+  minWeight: parseFloat(minWeight) || 0,
+  maxWeight: parseFloat(maxWeight) || 99999,
+  farm: selectedFarm,
+  pen: selectedPen,
+};
+
+    const filteredAnimals = await GetFilteredAnimalsApi(filters);
+    setSearchResults(filteredAnimals);
+  } catch (error) {
+    console.error("Error fetching filtered animals:", error);
+  }
+};
+
+useEffect(() => {
+  handleSearch();
+}, []);
+
+const resetFilters = () => {
+  setMinWeight("");
+  setMaxWeight("");
+  setSelectedFarm("all");
+  setSelectedPen("all");
+  handleSearch(); 
+};
 
   return (
     <SidebarProvider>

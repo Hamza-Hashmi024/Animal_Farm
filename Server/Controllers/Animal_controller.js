@@ -402,6 +402,59 @@ const GetAllBreeds = (req, res) => {
 
 
 
+const getFilteredAnimals = async (req, res) => {
+  try {
+    const { minWeight = 0, maxWeight = 99999, farm, pen } = req.query;
+
+    const conditions = [];
+    const values = [];
+
+    // Weight filter with NULL safety
+    conditions.push("COALESCE(cr.weight_kg, 0) BETWEEN ? AND ?");
+    values.push(minWeight, maxWeight);
+
+    if (farm && farm !== "all") {
+      conditions.push("LOWER(a.farm) = LOWER(?)");
+      values.push(farm);
+    }
+
+    if (pen && pen !== "all") {
+      conditions.push("LOWER(a.pen) = LOWER(?)");
+      values.push(pen);
+    }
+
+    const sql = `
+      SELECT 
+        a.id,
+        a.tag,
+        a.breed,
+        a.farm,
+        a.pen,
+        cr.weight_kg AS weight,
+        a.adg
+      FROM animals a
+      LEFT JOIN scheduled_checkpoints sc ON sc.animal_id = a.id
+      LEFT JOIN (
+        SELECT cr1.*
+        FROM checkpoint_records cr1
+        JOIN (
+          SELECT checkpoint_id, MAX(check_date) AS max_date
+          FROM checkpoint_records
+          GROUP BY checkpoint_id
+        ) cr2 ON cr1.checkpoint_id = cr2.checkpoint_id AND cr1.check_date = cr2.max_date
+      ) cr ON cr.checkpoint_id = sc.checkpoint_id
+      ${conditions.length ? `WHERE ${conditions.join(" AND ")}` : ""}
+    `;
+
+    const [rows] = await db.promise().execute(sql, values);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching filtered animals:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 module.exports = {
   registerAnimal,
@@ -409,5 +462,6 @@ module.exports = {
   getAnimalsWithCheckpoints,
   createCheckpointRecord,
   registerBreed,
-  GetAllBreeds
+  GetAllBreeds,
+  getFilteredAnimals
 };
