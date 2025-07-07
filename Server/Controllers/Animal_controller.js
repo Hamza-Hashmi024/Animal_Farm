@@ -389,6 +389,18 @@ const registerBreed = (req, res) => {
   });
 };
 
+const GetAllBreeds = (req, res) => {
+  const query = "SELECT * FROM animal_breeds";
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching breeds:", err);
+      return res.status(500).json({ message: "Server error" });
+      }
+      res.json(results);
+      });
+      };
+
+
 
 
 module.exports = {
@@ -396,5 +408,6 @@ module.exports = {
   GetAllAnimals,
   getAnimalsWithCheckpoints,
   createCheckpointRecord,
-  registerBreed
+  registerBreed,
+  GetAllBreeds
 };

@@ -111,3 +111,14 @@ export const RegisterBreedApi = async (data) => {
   }
 
 }
+
+export const GetAllBreedsApi = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/breeds`);
+    console.log("GetAllBreedsApi response:", response.data);
+    return response.data;
+  }catch (err){
+    console.error("Error in GetAllBreedsApi:", err);
+    throw err;
+  }
+}

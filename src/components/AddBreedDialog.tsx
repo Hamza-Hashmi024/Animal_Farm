@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import  { RegisterBreedApi } from "@/Apis/Api"; // Adjust the import path as necessary
+import  { RegisterBreedApi } from "@/Apis/Api";
 
 
 export const AddBreedDialog = ({ onBreedAdded }: { onBreedAdded?: () => void }) => {
@@ -47,3 +47,4 @@ export const AddBreedDialog = ({ onBreedAdded }: { onBreedAdded?: () => void }) 
     </Dialog>
   );
 };
+
