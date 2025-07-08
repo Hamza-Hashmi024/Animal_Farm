@@ -132,3 +132,18 @@ export const GetFilteredAnimalsApi = async (filters) => {
     throw err;
   }
 };
+
+
+
+export const GetAnimalWeightHistory = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/animals/weight-history`);
+    console.log("GetAnimalWeightHistory response:", response.data);
+    return response.data;
+
+  }catch(err){
+    console.error("Error in GetAnimalWeightHistory:", err);
+    throw err;
+  }
+
+}

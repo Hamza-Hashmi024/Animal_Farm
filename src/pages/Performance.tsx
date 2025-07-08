@@ -20,7 +20,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Target, Scale, TrendingUp } from "lucide-react";
-import { AnimalListApi } from "@/Apis/Api";
+import { GetAnimalWeightHistory } from "@/Apis/Api";
+
 
 const Performance = () => {
   const [animals, setAnimals] = useState([]);
@@ -32,34 +33,58 @@ const Performance = () => {
   const [penOptions, setPenOptions] = useState<string[]>([]);
   const [breedOptions, setBreedOptions] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchAnimals = async () => {
-      try {
-        const data = await AnimalListApi();
-        setAnimals(data);
+ useEffect(() => {
+  const fetchAndCalculatePerformance = async () => {
+    try {
+      const historyList = await GetAnimalWeightHistory();
 
-        // Extract unique values
-        const farms = Array.from(
-          new Set(data.map((animal) => animal.farm.trim()))
+      const processed = historyList.map((entry) => {
+        const { animal_id, tag, farm, pen, breed, weight_history } = entry;
+
+        if (!weight_history || weight_history.length < 2) {
+          return {
+            id: animal_id,
+            tag,
+            farm,
+            pen,
+            breed,
+            weight: weight_history?.[0]?.weight || 0,
+            adg: 0,
+          };
+        }
+
+        const sorted = weight_history.sort(
+          (a, b) => new Date(a.check_date) - new Date(b.check_date)
         );
-        const pens = Array.from(
-          new Set(data.map((animal) => animal.pen.trim()))
-        );
-        const breeds = Array.from(
-          new Set(data.map((animal) => animal.breed.trim()))
-        );
 
-        setFarmOptions(farms);
-        setPenOptions(pens);
-        setBreedOptions(breeds);
-      } catch (error) {
-        console.error("Failed to fetch animals:", error);
-      }
-    };
+        const first = sorted[0];
+        const last = sorted[sorted.length - 1];
 
-    fetchAnimals();
-  }, []);
+        const days =
+          (new Date(last.check_date) - new Date(first.check_date)) /
+          (1000 * 60 * 60 * 24);
+        const adg = days > 0 ? (last.weight - first.weight) / days : 0;
 
+        return {
+          id: animal_id,
+          tag,
+          farm,
+          pen,
+          breed,
+          weight: last.weight,
+          adg: parseFloat(adg.toFixed(2)),
+        };
+      });
+
+      setAnimals(processed);
+    } catch (err) {
+      console.error("Error loading animal weight history:", err);
+    }
+  };
+
+  fetchAndCalculatePerformance();
+}, []);
+  
   const filterAnimals = (animals) => {
     return animals.filter((animal) => {
       return (

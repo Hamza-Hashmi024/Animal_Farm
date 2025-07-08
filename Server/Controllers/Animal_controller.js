@@ -93,12 +93,10 @@ const registerAnimal = async (req, res) => {
             return res.status(500).json({ message: "Commit failed" });
           });
         } else {
-          res
-            .status(201)
-            .json({
-              message:
-                "Animal registered and checkpoints scheduled successfully.",
-            });
+          res.status(201).json({
+            message:
+              "Animal registered and checkpoints scheduled successfully.",
+          });
         }
       });
     } catch (error) {
@@ -160,111 +158,7 @@ const getAnimalsWithCheckpoints = async (req, res) => {
   }
 };
 
-
-
-
-
-// const createCheckpointRecord = async (req, res) => {
-//   const { checkpointId } = req.params;
-//   const {
-//     check_date,
-//     weight_kg,
-//     notes,
-//     vaccine,
-//     dewormer,
-//     medicines = []
-//   } = req.body;
-
-//   if (!check_date) {
-//     return res.status(400).json({ error: "Check date is required" });
-//   }
-
-//   const dbPromise = db.promise();
-
-//   try {
-//     await dbPromise.query('START TRANSACTION');
-
-//     // 1. Insert into checkpoint_records
-//     const [recordResult] = await dbPromise.query(
-//       `INSERT INTO checkpoint_records (checkpoint_id, check_date, weight_kg, notes)
-//        VALUES (?, ?, ?, ?)`,
-//       [checkpointId, check_date, weight_kg || null, notes || null]
-//     );
-
-//     const recordId = recordResult.insertId;
-
-//     // 2. Update scheduled_checkpoints with record info
-//     await dbPromise.query(
-//       `UPDATE scheduled_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
-//       [recordId, checkpointId]
-//     );
-
-//     // 3. Prepare treatments
-//     const treatments = [];
-
-//     if (vaccine?.name) {
-//       treatments.push([
-//         recordId,
-//         'vaccine',
-//         vaccine.name,
-//         vaccine.batch || null,
-//         vaccine.dose || null,
-//         null
-//       ]);
-//     }
-
-//     if (dewormer?.name) {
-//       treatments.push([
-//         recordId,
-//         'dewormer',
-//         dewormer.name,
-//         null,
-//         dewormer.dose || null,
-//         null
-//       ]);
-//     }
-
-//     for (const med of medicines) {
-//       if (med.name) {
-//         treatments.push([
-//           recordId,
-//           'medicine',
-//           med.name,
-//           null,
-//           med.dose || null,
-//           null
-//         ]);
-//       }
-//     }
-
-//     // 4. Insert treatments
-//     if (treatments.length > 0) {
-//       await dbPromise.query(
-//         `INSERT INTO treatments (record_id, category, name, batch_no, dose, notes) VALUES ?`,
-//         [treatments]
-//       );
-//     }
-
-//     // 5. Commit transaction
-//     await dbPromise.query('COMMIT');
-
-//     res.status(201).json({
-//       message: "Checkpoint record and treatments saved",
-//       recordId
-//     });
-
-//   } catch (err) {
-//     await dbPromise.query('ROLLBACK');
-//     console.error("Error in createCheckpointRecord:", err.message);
-//     res.status(500).json({ error: "Failed to save checkpoint record" });
-//   }
-// };
-
-
-
-// rEGISTER bREAD 
-
-
+// This Chunk of code cratES a CHECKPOINT rECORD anad also Update The data aND aLSO iNSERT tHE DATA iN table Animal wEIGHT hISTORY to Track aNIMAL Perfoance  
 const createCheckpointRecord = async (req, res) => {
   const { checkpointId } = req.params;
   const {
@@ -273,7 +167,7 @@ const createCheckpointRecord = async (req, res) => {
     notes,
     vaccine,
     dewormer,
-    medicines = []
+    medicines = [],
   } = req.body;
 
   if (!check_date) {
@@ -283,7 +177,7 @@ const createCheckpointRecord = async (req, res) => {
   const dbPromise = db.promise();
 
   try {
-    await dbPromise.query('START TRANSACTION');
+    await dbPromise.query("START TRANSACTION");
 
     // 1. Insert into checkpoint_records
     const [recordResult] = await dbPromise.query(
@@ -306,22 +200,22 @@ const createCheckpointRecord = async (req, res) => {
     if (vaccine?.name) {
       treatments.push([
         recordId,
-        'vaccine',
+        "vaccine",
         vaccine.name,
         vaccine.batch || null,
         vaccine.dose || null,
-        null
+        null,
       ]);
     }
 
     if (dewormer?.name) {
       treatments.push([
         recordId,
-        'dewormer',
+        "dewormer",
         dewormer.name,
         null,
         dewormer.dose || null,
-        null
+        null,
       ]);
     }
 
@@ -329,11 +223,11 @@ const createCheckpointRecord = async (req, res) => {
       if (med.name) {
         treatments.push([
           recordId,
-          'medicine',
+          "medicine",
           med.name,
           null,
           med.dose || null,
-          null
+          null,
         ]);
       }
     }
@@ -373,57 +267,51 @@ const createCheckpointRecord = async (req, res) => {
     let overallAdg = null;
 
     const currentIndex = historyRows.findIndex(
-      row => row.check_date.toISOString().split('T')[0] === check_date
+      (row) => row.check_date.toISOString().split("T")[0] === check_date
     );
 
     if (currentIndex > 0) {
       const prev = historyRows[currentIndex - 1];
       weightDiff = parseFloat(weight_kg) - parseFloat(prev.weight_kg);
       const diffDays = Math.ceil(
-        (new Date(check_date) - new Date(prev.check_date)) / (1000 * 60 * 60 * 24)
+        (new Date(check_date) - new Date(prev.check_date)) /
+          (1000 * 60 * 60 * 24)
       );
       daysSince = diffDays;
-      adg = diffDays > 0 ? parseFloat((weightDiff / diffDays).toFixed(2)) : null;
+      adg =
+        diffDays > 0 ? parseFloat((weightDiff / diffDays).toFixed(2)) : null;
     }
 
     const first = historyRows[0];
     const totalDays = Math.ceil(
-      (new Date(check_date) - new Date(first.check_date)) / (1000 * 60 * 60 * 24)
+      (new Date(check_date) - new Date(first.check_date)) /
+        (1000 * 60 * 60 * 24)
     );
     const totalDiff = parseFloat(weight_kg) - parseFloat(first.weight_kg);
-    overallAdg = totalDays > 0 ? parseFloat((totalDiff / totalDays).toFixed(2)) : null;
+    overallAdg =
+      totalDays > 0 ? parseFloat((totalDiff / totalDays).toFixed(2)) : null;
 
     // Insert into animal_weight_history
     await dbPromise.query(
       `INSERT INTO animal_weight_history 
        (animal_id, check_date, weight_kg, weight_diff, days_since_last, adg, overall_adg)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        animalId,
-        check_date,
-        weight_kg,
-        weightDiff,
-        daysSince,
-        adg,
-        overallAdg
-      ]
+      [animalId, check_date, weight_kg, weightDiff, daysSince, adg, overallAdg]
     );
 
     // 6. Commit transaction
-    await dbPromise.query('COMMIT');
+    await dbPromise.query("COMMIT");
 
     res.status(201).json({
       message: "Checkpoint record, treatments, and weight history saved",
-      recordId
+      recordId,
     });
-
   } catch (err) {
-    await dbPromise.query('ROLLBACK');
+    await dbPromise.query("ROLLBACK");
     console.error("Error in createCheckpointRecord:", err.message);
     res.status(500).json({ error: "Failed to save checkpoint record" });
   }
 };
-
 
 const registerBreed = (req, res) => {
   const { name, description } = req.body;
@@ -456,10 +344,10 @@ const GetAllBreeds = (req, res) => {
     if (err) {
       console.error("Error fetching breeds:", err);
       return res.status(500).json({ message: "Server error" });
-      }
-      res.json(results);
-      });
-      };
+    }
+    res.json(results);
+  });
+};
 
 const getFilteredAnimals = async (req, res) => {
   try {
@@ -513,6 +401,53 @@ const getFilteredAnimals = async (req, res) => {
   }
 };
 
+const GetAllAnimalWeightHistory = async (req, res) => {
+  try {
+    const dbPromise = db.promise();
+
+    const [results] = await dbPromise.query(`
+      SELECT 
+        a.id AS animal_id,
+        a.tag,
+        a.farm,
+        a.pen,
+        a.breed,
+        h.check_date,
+        h.weight_kg AS weight,
+        h.adg
+      FROM animals a
+      LEFT JOIN animal_weight_history h ON a.id = h.animal_id
+      ORDER BY a.id, h.check_date ASC
+    `);
+
+    // Group results by animal_id
+    const grouped = results.reduce((acc, row) => {
+      if (!acc[row.animal_id]) {
+        acc[row.animal_id] = {
+          animal_id: row.animal_id,
+          tag: row.tag,
+          farm: row.farm,
+          pen: row.pen,
+          breed: row.breed,
+          weight_history: [],
+        };
+      }
+      if (row.check_date) {
+        acc[row.animal_id].weight_history.push({
+          check_date: row.check_date,
+          weight: row.weight,
+          adg: row.adg,
+        });
+      }
+      return acc;
+    }, {});
+
+    res.status(200).json(Object.values(grouped));
+  } catch (error) {
+    console.error("Error fetching weight history for all animals:", error.message);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+};
 
 
 module.exports = {
@@ -522,5 +457,7 @@ module.exports = {
   createCheckpointRecord,
   registerBreed,
   GetAllBreeds,
-  getFilteredAnimals
+  getFilteredAnimals,
+ GetAllAnimalWeightHistory
+ 
 };
