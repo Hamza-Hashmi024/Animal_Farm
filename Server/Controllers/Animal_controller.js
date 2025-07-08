@@ -8,10 +8,8 @@ const registerAnimal = async (req, res) => {
     breed,
     coatColor,
     age,
-    arrivalWeight,
     purchaseDate,
     price,
-    ratePerKg,
     mandi,
     purchaser,
     farm,
@@ -32,10 +30,10 @@ const registerAnimal = async (req, res) => {
       const insertAnimalQuery = `
         INSERT INTO animals (
           tag, sr_no, breed, coat_color, age,
-          arrival_weight, purchase_date, price, rate_per_kg,
+           purchase_date, price, 
           mandi, purchaser, farm, pen,
           investor, doctor, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       const animalValues = [
@@ -44,10 +42,8 @@ const registerAnimal = async (req, res) => {
         breed,
         coatColor || null,
         age || 0,
-        arrivalWeight,
         purchaseDate,
         price,
-        ratePerKg || 0,
         mandi || null,
         purchaser || null,
         farm,
@@ -164,7 +160,10 @@ const getAnimalsWithCheckpoints = async (req, res) => {
   }
 };
 
-// tHIS cHUNK oF CODE uPDATEING uPDATED wEIGHT OF aNIMAL 
+
+
+
+
 // const createCheckpointRecord = async (req, res) => {
 //   const { checkpointId } = req.params;
 //   const {
@@ -180,13 +179,13 @@ const getAnimalsWithCheckpoints = async (req, res) => {
 //     return res.status(400).json({ error: "Check date is required" });
 //   }
 
-//   const connection = await db.getConnection();
+//   const dbPromise = db.promise();
 
 //   try {
-//     await connection.beginTransaction();
+//     await dbPromise.query('START TRANSACTION');
 
 //     // 1. Insert into checkpoint_records
-//     const [recordResult] = await connection.query(
+//     const [recordResult] = await dbPromise.query(
 //       `INSERT INTO checkpoint_records (checkpoint_id, check_date, weight_kg, notes)
 //        VALUES (?, ?, ?, ?)`,
 //       [checkpointId, check_date, weight_kg || null, notes || null]
@@ -194,13 +193,13 @@ const getAnimalsWithCheckpoints = async (req, res) => {
 
 //     const recordId = recordResult.insertId;
 
-//     // 2. Update animal_checkpoints with completion
-//     await connection.query(
-//       `UPDATE animal_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
+//     // 2. Update scheduled_checkpoints with record info
+//     await dbPromise.query(
+//       `UPDATE scheduled_checkpoints SET completed_at = NOW(), record_id = ? WHERE checkpoint_id = ?`,
 //       [recordId, checkpointId]
 //     );
 
-//     // 3. Build treatments
+//     // 3. Prepare treatments
 //     const treatments = [];
 
 //     if (vaccine?.name) {
@@ -225,30 +224,29 @@ const getAnimalsWithCheckpoints = async (req, res) => {
 //       ]);
 //     }
 
-//     if (Array.isArray(medicines)) {
-//       for (const med of medicines) {
-//         if (med.name) {
-//           treatments.push([
-//             recordId,
-//             'medicine',
-//             med.name,
-//             null,
-//             med.dose || null,
-//             null
-//           ]);
-//         }
+//     for (const med of medicines) {
+//       if (med.name) {
+//         treatments.push([
+//           recordId,
+//           'medicine',
+//           med.name,
+//           null,
+//           med.dose || null,
+//           null
+//         ]);
 //       }
 //     }
 
-//     // 4. Insert treatments if any
+//     // 4. Insert treatments
 //     if (treatments.length > 0) {
-//       await connection.query(
+//       await dbPromise.query(
 //         `INSERT INTO treatments (record_id, category, name, batch_no, dose, notes) VALUES ?`,
 //         [treatments]
 //       );
 //     }
 
-//     await connection.commit();
+//     // 5. Commit transaction
+//     await dbPromise.query('COMMIT');
 
 //     res.status(201).json({
 //       message: "Checkpoint record and treatments saved",
@@ -256,13 +254,16 @@ const getAnimalsWithCheckpoints = async (req, res) => {
 //     });
 
 //   } catch (err) {
-//     await connection.rollback();
-//     console.error(" Error in createCheckpointRecord:", err.message);
+//     await dbPromise.query('ROLLBACK');
+//     console.error("Error in createCheckpointRecord:", err.message);
 //     res.status(500).json({ error: "Failed to save checkpoint record" });
-//   } finally {
-//     connection.release(); 
 //   }
 // };
+
+
+
+// rEGISTER bREAD 
+
 
 const createCheckpointRecord = async (req, res) => {
   const { checkpointId } = req.params;
@@ -345,11 +346,74 @@ const createCheckpointRecord = async (req, res) => {
       );
     }
 
-    // 5. Commit transaction
+    // 5. Weight history logic starts here
+
+    // Get animal_id from checkpoint
+    const [[checkpointRow]] = await dbPromise.query(
+      `SELECT animal_id FROM scheduled_checkpoints WHERE checkpoint_id = ?`,
+      [checkpointId]
+    );
+    const animalId = checkpointRow.animal_id;
+
+    // Fetch all past weight records (including this one)
+    const [historyRows] = await dbPromise.query(
+      `
+      SELECT cr.check_date, cr.weight_kg
+      FROM checkpoint_records cr
+      JOIN scheduled_checkpoints sc ON cr.checkpoint_id = sc.checkpoint_id
+      WHERE sc.animal_id = ?
+      ORDER BY cr.check_date ASC
+      `,
+      [animalId]
+    );
+
+    let weightDiff = null;
+    let daysSince = null;
+    let adg = null;
+    let overallAdg = null;
+
+    const currentIndex = historyRows.findIndex(
+      row => row.check_date.toISOString().split('T')[0] === check_date
+    );
+
+    if (currentIndex > 0) {
+      const prev = historyRows[currentIndex - 1];
+      weightDiff = parseFloat(weight_kg) - parseFloat(prev.weight_kg);
+      const diffDays = Math.ceil(
+        (new Date(check_date) - new Date(prev.check_date)) / (1000 * 60 * 60 * 24)
+      );
+      daysSince = diffDays;
+      adg = diffDays > 0 ? parseFloat((weightDiff / diffDays).toFixed(2)) : null;
+    }
+
+    const first = historyRows[0];
+    const totalDays = Math.ceil(
+      (new Date(check_date) - new Date(first.check_date)) / (1000 * 60 * 60 * 24)
+    );
+    const totalDiff = parseFloat(weight_kg) - parseFloat(first.weight_kg);
+    overallAdg = totalDays > 0 ? parseFloat((totalDiff / totalDays).toFixed(2)) : null;
+
+    // Insert into animal_weight_history
+    await dbPromise.query(
+      `INSERT INTO animal_weight_history 
+       (animal_id, check_date, weight_kg, weight_diff, days_since_last, adg, overall_adg)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        animalId,
+        check_date,
+        weight_kg,
+        weightDiff,
+        daysSince,
+        adg,
+        overallAdg
+      ]
+    );
+
+    // 6. Commit transaction
     await dbPromise.query('COMMIT');
 
     res.status(201).json({
-      message: "Checkpoint record and treatments saved",
+      message: "Checkpoint record, treatments, and weight history saved",
       recordId
     });
 
@@ -360,9 +424,6 @@ const createCheckpointRecord = async (req, res) => {
   }
 };
 
-
-
-// rEGISTER bREAD 
 
 const registerBreed = (req, res) => {
   const { name, description } = req.body;
@@ -399,8 +460,6 @@ const GetAllBreeds = (req, res) => {
       res.json(results);
       });
       };
-
-
 
 const getFilteredAnimals = async (req, res) => {
   try {

@@ -38,62 +38,17 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
     breed: "",
     coatColor: "",
     age: "",
-    arrivalWeight: "",
     purchaseDate: "",
     price: "",
-    ratePerKg: "",
     mandi: "",
     purchaser: "",
     farm: "",
     pen: "",
     investor: "",
     doctor: "",
-
   });
   const [breeds, setBreeds] = useState([]);
   const { toast } = useToast();
-
-  // useEffect(() => {
-  //   const fetchFarms = async () => {
-  //     try {
-  //       const data = await FarmNumbersApi();
-  //       setFarms(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch farm numbers:", error);
-  //     }
-  //   };
-
-  //   fetchFarms();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchFarmsAndInvestors = async () => {
-  //     try {
-  //       const farmData = await FarmNumbersApi();
-  //       const investorData = await InvestorNamesApi();
-  //       setFarms(farmData);
-  //       setInvestors(investorData);
-  //     } catch (error) {
-  //       console.error("Failed to fetch data:", error);
-  //     }
-  //   };
-
-  //   fetchFarmsAndInvestors();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchBreeds = async () => {
-  //     try {
-  //       const breeds = await GetAllBreedsApi();
-  //       setBreeds(breeds);
-  //       } catch (error) {
-  //         console.error("Failed to fetch breeds:", error);
-  //         }
-  //         };
-  //         fetchBreeds();
-  //         }, []);
-
-  // }
 
   useEffect(() => {
     const fetchFarmsAndInvestors = async () => {
@@ -120,7 +75,6 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       !formData.tag ||
       !formData.srNo ||
       !formData.breed ||
-      !formData.arrivalWeight ||
       !formData.purchaseDate ||
       !formData.price ||
       !formData.farm ||
@@ -140,17 +94,14 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
       breed: formData.breed,
       coatColor: formData.coatColor || null,
       age: parseInt(formData.age) || 0,
-      arrivalWeight: parseFloat(formData.arrivalWeight),
       purchaseDate: formData.purchaseDate,
       price: parseFloat(formData.price),
-      ratePerKg: parseFloat(formData.ratePerKg) || 0,
       mandi: formData.mandi || null,
       purchaser: formData.purchaser || null,
       farm: formData.farm,
       pen: formData.pen,
       investor: formData.investor || null,
       doctor: formData.doctor || null,
-      
     };
 
     try {
@@ -295,19 +246,6 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="arrivalWeight">Arrival Weight (kg) *</Label>
-                <Input
-                  id="arrivalWeight"
-                  type="number"
-                  value={formData.arrivalWeight}
-                  onChange={(e) =>
-                    setFormData({ ...formData, arrivalWeight: e.target.value })
-                  }
-                  placeholder="450"
-                  required
-                />
-              </div>
-              <div>
                 <Label htmlFor="purchaseDate">Purchase Date *</Label>
                 <Input
                   id="purchaseDate"
@@ -334,18 +272,7 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="ratePerKg">Rate/kg</Label>
-                <Input
-                  id="ratePerKg"
-                  type="number"
-                  value={formData.ratePerKg}
-                  onChange={(e) =>
-                    setFormData({ ...formData, ratePerKg: e.target.value })
-                  }
-                  placeholder="120"
-                />
-              </div>
+
               <div>
                 <Label htmlFor="mandi">Mandi</Label>
                 <Input
@@ -448,8 +375,6 @@ export function AddAnimalDialog({ onAddAnimal }: AddAnimalDialogProps) {
               </div>
             </div>
           </div>
-
-         
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button
