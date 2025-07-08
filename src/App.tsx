@@ -16,6 +16,7 @@ import FindAnimals from "./pages/FindAnimals";
 import Quarantine from "./pages/Quarantine";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
+import Death from "./pages/Death";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/reports" element={<Reports />} />
           <Route path="/investors" element={<Investors />} />
           <Route path="/farms" element={<Farms />} />
+          <Route path="/death" element={<Death />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

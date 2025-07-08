@@ -40,6 +40,8 @@ const navigation = [
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Investors", href: "/investors", icon: Users },
   { name: "Farms", href: "/farms", icon: MapPin },
+  { name: "Report Death", href: "/death", icon: MapPin },
+  
 ];
 
 export function AppSidebar() {
