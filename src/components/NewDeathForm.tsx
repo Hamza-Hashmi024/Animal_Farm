@@ -26,6 +26,7 @@ export const NewDeathForm = ({ onSubmit, onClose }: NewDeathFormProps) => {
   const [formData, setFormData] = useState({
     animalId: "",
     cause: "",
+    causeOfDeath: "",
     date: "",
     pen: "",
     farm: "",
@@ -57,6 +58,31 @@ export const NewDeathForm = ({ onSubmit, onClose }: NewDeathFormProps) => {
         <label className="block text-sm font-medium mb-1">Animal ID</label>
         <Input name="animalId" value={formData.animalId} onChange={handleChange} required />
       </div>
+
+        {/* Death Cause  Selector */}
+     <div className="mt-4">
+  <label className="block text-sm font-medium mb-1">Type Majur Cause Of Death</label>
+  <Select
+    value={formData.causeOfDeath}
+    onValueChange={(value) => setFormData({ ...formData, causeOfDeath: value })}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select Cause" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="Disease">Disease</SelectItem>
+      <SelectItem value="Injury">Injury</SelectItem>
+      <SelectItem value="Unknown">Unknown</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+
+
+
+
+
+
+
 
       <div>
         <label className="block text-sm font-medium mb-1">Cause of Death</label>

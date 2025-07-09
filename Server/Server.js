@@ -9,6 +9,7 @@ const db = require("./config/db");
 const animalRoutes = require("./Routes/AnimalRoutes");
 const farmRoutes = require("./Routes/FarmRoutes");
 const inverterRoutes = require("./Routes/InverterRoute");
+const deathRoutes = require("./Routes/DeathRoute");
 
 
 
@@ -24,6 +25,7 @@ app.use(cors({
 app.use("/api", animalRoutes);
 app.use("/api" , farmRoutes);
 app.use("/api", inverterRoutes);
+app.use("/api", deathRoutes);
 
 app.get("/", (req, res) => {
   res.send(`Server Is Created Successfully on Port ${Port}`);
