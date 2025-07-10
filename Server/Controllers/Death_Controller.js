@@ -2,9 +2,6 @@ const db = require("../config/db");
 
 
 // it will record the death and also change the status on Animal 
-
-
-
 const addDeathRecord = (req, res) => {
   const { animalId, cause, causeOfDeath, date, changedBy = null } = req.body;
 

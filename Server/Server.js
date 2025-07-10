@@ -10,6 +10,7 @@ const animalRoutes = require("./Routes/AnimalRoutes");
 const farmRoutes = require("./Routes/FarmRoutes");
 const inverterRoutes = require("./Routes/InverterRoute");
 const deathRoutes = require("./Routes/DeathRoute");
+const SlaughterRoutes = require("./Routes/SlaughterRoutes")
 
 
 
@@ -26,6 +27,7 @@ app.use("/api", animalRoutes);
 app.use("/api" , farmRoutes);
 app.use("/api", inverterRoutes);
 app.use("/api", deathRoutes);
+app.use("/api", SlaughterRoutes);
 
 app.get("/", (req, res) => {
   res.send(`Server Is Created Successfully on Port ${Port}`);

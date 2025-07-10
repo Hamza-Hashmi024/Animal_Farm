@@ -138,34 +138,40 @@ export const GetAnimalWeightHistory = async () => {
     const response = await axios.get(`${Base_Url}/api/animals/weight-history`);
     console.log("GetAnimalWeightHistory response:", response.data);
     return response.data;
-
-  }catch(err){
+  } catch (err) {
     console.error("Error in GetAnimalWeightHistory:", err);
     throw err;
   }
-
-}
+};
 
 export const AddDeathRecordApi = async (data) => {
-  try{
+  try {
     const response = await axios.post(`${Base_Url}/api/death-records`, data);
     console.log("AddDeathRecordApi response:", response.data);
     return response.data;
-
-  }catch(err){
+  } catch (err) {
     console.error("Error in AddDeathRecordApi:", err);
     throw err;
   }
-
-}
+};
 
 export const GetAnimalByIdApi = async (animalId) => {
   try {
     const response = await axios.get(`${Base_Url}/api/animals/${animalId}`);
     console.log("GetAnimalByIdApi response:", response.data);
     return response.data;
-  }catch (err){
+  } catch (err) {
     console.error("Error in GetAnimalByIdApi:", err);
     throw err;
   }
-}
+};
+
+export const RecordSlaughter = async (data: any) => {
+  try {
+    const response = await axios.post(`${Base_Url}/api/record/slaughter`, data);
+    return response.data;
+  } catch (err) {
+    console.error("Error posting slaughter record:", err);
+    throw err;
+  }
+};

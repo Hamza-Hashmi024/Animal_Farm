@@ -30,6 +30,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { RecordSlaughter } from "@/Apis/Api";
 
 interface SlaughterFormData {
   animalTag: string;
@@ -61,23 +62,30 @@ export function SlaughterRecordDialog() {
     },
   });
 
-  const onSubmit = (data: SlaughterFormData) => {
-    // Calculate carcass ratio if not provided
-    const ratio = data.carcassRatio || 
+ const onSubmit = async (data: SlaughterFormData) => {
+  try {
+    const ratio = data.carcassRatio ||
       ((parseFloat(data.carcassWeight) / parseFloat(data.weightBeforeSlaughter)) * 100).toFixed(1);
-    
+
     const recordData = { ...data, carcassRatio: ratio };
-    
-    console.log("New slaughter record:", recordData);
-    
+
+    const result = await  RecordSlaughter(recordData);
+
     toast({
       title: "Slaughter Record Added",
-      description: `Record for animal ${data.animalTag} has been successfully recorded.`,
+      description: `Animal ${data.animalTag} processed successfully.`,
     });
-    
+
     form.reset();
     setOpen(false);
-  };
+  } catch (error: any) {
+    toast({
+      title: "Error",
+      description: error?.response?.data?.message || "Failed to record slaughter",
+      variant: "destructive",
+    });
+  }
+};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
