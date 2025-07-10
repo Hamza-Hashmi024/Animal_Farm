@@ -175,3 +175,13 @@ export const RecordSlaughter = async (data: any) => {
     throw err;
   }
 };
+
+export const RecordIncident = async (incidentData) => {
+  try {
+    const response = await axios.post(`${Base_Url}/api/Register/incident`, incidentData);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to record incident:", error);
+    throw error;
+  }
+};

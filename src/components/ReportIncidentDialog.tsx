@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState  ,  useEffect} from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,6 +30,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { RecordIncident , GetAnimalByIdApi } from "@/Apis/Api";
 
 interface IncidentFormData {
   animalTag: string;
@@ -55,18 +56,53 @@ export function ReportIncidentDialog() {
     },
   });
 
-  const onSubmit = (data: IncidentFormData) => {
-    // In a real app, this would save to a database
-    console.log("New incident reported:", data);
-    
+  const watchAnimalTag = form.watch("animalTag");
+
+ const onSubmit = async (data: IncidentFormData) => {
+  try {
+    const response = await RecordIncident(data);
+
     toast({
       title: "Incident Reported",
-      description: `Incident for animal ${data.animalTag} has been successfully reported.`,
+      description: `Incident for animal ${data.animalTag} has been successfully recorded.`,
     });
-    
+
     form.reset();
     setOpen(false);
+  } catch (error: any) {
+    console.error("Error reporting incident:", error);
+
+    toast({
+      title: "Error",
+      variant: "destructive",
+      description: error?.response?.data?.message || "Failed to report incident. Please try again.",
+    });
+  }
+};
+
+useEffect(() => {
+  const fetchAnimalDetails = async () => {
+    if (!watchAnimalTag || watchAnimalTag.trim() === "") return;
+
+    try {
+      const data = await GetAnimalByIdApi(watchAnimalTag);
+
+      if (data?.farm) {
+        form.setValue("farm", data.farm);
+      }
+
+      if (data?.pen) {
+        form.setValue("pen", data.pen);
+      }
+    } catch (err) {
+      console.error("Error fetching animal data:", err);
+      form.setValue("farm", "");
+      form.setValue("pen", "");
+    }
   };
+
+  fetchAnimalDetails();
+}, [watchAnimalTag, form]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

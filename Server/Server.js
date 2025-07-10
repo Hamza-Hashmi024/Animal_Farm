@@ -11,7 +11,7 @@ const farmRoutes = require("./Routes/FarmRoutes");
 const inverterRoutes = require("./Routes/InverterRoute");
 const deathRoutes = require("./Routes/DeathRoute");
 const SlaughterRoutes = require("./Routes/SlaughterRoutes")
-
+const IncidentRoute = require("./Routes/IncidentRoutes")
 
 
 app.use(express.json());
@@ -28,6 +28,7 @@ app.use("/api" , farmRoutes);
 app.use("/api", inverterRoutes);
 app.use("/api", deathRoutes);
 app.use("/api", SlaughterRoutes);
+app.use("/api" , IncidentRoute);
 
 app.get("/", (req, res) => {
   res.send(`Server Is Created Successfully on Port ${Port}`);

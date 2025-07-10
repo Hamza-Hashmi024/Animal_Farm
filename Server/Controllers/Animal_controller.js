@@ -1,6 +1,112 @@
 const db = require("../config/db");
 
 // This ChunkOf Code Register An animal AND aLSO Schedules Checkpoints
+// const registerAnimal = async (req, res) => {
+//   const {
+//     tag,
+//     srNo,
+//     breed,
+//     coatColor,
+//     age,
+//     purchaseDate,
+//     price,
+//     mandi,
+//     purchaser,
+//     farm,
+//     pen,
+//     investor,
+//     doctor,
+//     status,
+//   } = req.body;
+
+//   db.beginTransaction(async (err) => {
+//     if (err) {
+//       console.error("Transaction Error:", err);
+//       return res.status(500).json({ message: "Transaction failed" });
+//     }
+
+//     try {
+//       // 1. Insert animal
+//       const insertAnimalQuery = `
+//         INSERT INTO animals (
+//           tag, sr_no, breed, coat_color, age,
+//            purchase_date, price, 
+//           mandi, purchaser, farm, pen,
+//           investor, doctor, status
+//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//       `;
+
+//       const animalValues = [
+//         tag,
+//         srNo,
+//         breed,
+//         coatColor || null,
+//         age || 0,
+//         purchaseDate,
+//         price,
+//         mandi || null,
+//         purchaser || null,
+//         farm,
+//         pen,
+//         investor || null,
+//         doctor || null,
+//         status || "Active",
+//       ];
+
+//       const [animalResult] = await db
+//         .promise()
+//         .execute(insertAnimalQuery, animalValues);
+//       const animalId = animalResult.insertId;
+
+//       // 2. Fetch templates
+//       const [templates] = await db
+//         .promise()
+//         .query(
+//           `SELECT template_id, day_offset FROM checkpoint_templates WHERE is_active = 1`
+//         );
+
+//       // 3. Prepare checkpoint values
+//       const checkpoints = templates.map(({ template_id, day_offset }) => {
+//         const scheduledDate = new Date(purchaseDate);
+//         scheduledDate.setDate(scheduledDate.getDate() + day_offset);
+//         return [
+//           animalId,
+//           template_id,
+//           scheduledDate.toISOString().split("T")[0],
+//         ];
+//       });
+
+//       // 4. Insert checkpoints if any
+//       if (checkpoints.length > 0) {
+//         await db
+//           .promise()
+//           .query(
+//             `INSERT INTO scheduled_checkpoints (animal_id, template_id, scheduled_date) VALUES ?`,
+//             [checkpoints]
+//           );
+//       }
+
+//       db.commit((commitErr) => {
+//         if (commitErr) {
+//           db.rollback(() => {
+//             console.error("Commit failed:", commitErr);
+//             return res.status(500).json({ message: "Commit failed" });
+//           });
+//         } else {
+//           res.status(201).json({
+//             message:
+//               "Animal registered and checkpoints scheduled successfully.",
+//           });
+//         }
+//       });
+//     } catch (error) {
+//       db.rollback(() => {
+//         console.error("Transaction failed:", error);
+//         return res.status(500).json({ message: "Server error" });
+//       });
+//     }
+//   });
+// };
 const registerAnimal = async (req, res) => {
   const {
     tag,
@@ -19,6 +125,8 @@ const registerAnimal = async (req, res) => {
     status,
   } = req.body;
 
+  const animalStatus = status || "Active";
+
   db.beginTransaction(async (err) => {
     if (err) {
       console.error("Transaction Error:", err);
@@ -30,7 +138,7 @@ const registerAnimal = async (req, res) => {
       const insertAnimalQuery = `
         INSERT INTO animals (
           tag, sr_no, breed, coat_color, age,
-           purchase_date, price, 
+          purchase_date, price, 
           mandi, purchaser, farm, pen,
           investor, doctor, status
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -50,22 +158,41 @@ const registerAnimal = async (req, res) => {
         pen,
         investor || null,
         doctor || null,
-        status || "Active",
+        animalStatus,
       ];
 
       const [animalResult] = await db
         .promise()
         .execute(insertAnimalQuery, animalValues);
+
       const animalId = animalResult.insertId;
 
-      // 2. Fetch templates
+      // 2. Insert into status_history
+      const insertHistoryQuery = `
+        INSERT INTO status_history 
+        (animal_tag, previous_status, new_status, changed_by, change_reason, reference_id) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      const statusHistoryValues = [
+        tag,
+        "Inactive",            // previous_status
+        animalStatus,          // new_status
+        null,                  // changed_by (optional - set to req.user?.name if using auth)
+        "Manual",              // reason
+        animalId               // reference_id (could be useful for traceability)
+      ];
+
+      await db.promise().execute(insertHistoryQuery, statusHistoryValues);
+
+      // 3. Fetch templates
       const [templates] = await db
         .promise()
         .query(
           `SELECT template_id, day_offset FROM checkpoint_templates WHERE is_active = 1`
         );
 
-      // 3. Prepare checkpoint values
+      // 4. Prepare checkpoint values
       const checkpoints = templates.map(({ template_id, day_offset }) => {
         const scheduledDate = new Date(purchaseDate);
         scheduledDate.setDate(scheduledDate.getDate() + day_offset);
@@ -76,7 +203,7 @@ const registerAnimal = async (req, res) => {
         ];
       });
 
-      // 4. Insert checkpoints if any
+      // 5. Insert checkpoints
       if (checkpoints.length > 0) {
         await db
           .promise()
@@ -86,6 +213,7 @@ const registerAnimal = async (req, res) => {
           );
       }
 
+      // 6. Commit transaction
       db.commit((commitErr) => {
         if (commitErr) {
           db.rollback(() => {
@@ -95,7 +223,7 @@ const registerAnimal = async (req, res) => {
         } else {
           res.status(201).json({
             message:
-              "Animal registered and checkpoints scheduled successfully.",
+              "Animal registered, status logged, and checkpoints scheduled successfully.",
           });
         }
       });
@@ -107,6 +235,8 @@ const registerAnimal = async (req, res) => {
     }
   });
 };
+
+
 
 const GetAllAnimals = async (req, res) => {
   try {
