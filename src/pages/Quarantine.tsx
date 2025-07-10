@@ -60,54 +60,7 @@ const Quarantine = () => {
               <p className="text-gray-600 mt-1">Manage animals in quarantine and add new entries</p>
             </div>
 
-            {/* Add New Quarantine Entry */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
-                  Add New Quarantine Entry
-                </CardTitle>
-                <CardDescription>Record a new animal quarantine entry</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Animal Tag</label>
-                    <Input
-                      placeholder="e.g., TAG-123"
-                      value={tag}
-                      onChange={(e) => setTag(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Quarantine Date</label>
-                    <Input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium invisible">Action</label>
-                    <Button type="submit" className="w-full">
-                      Add to Quarantine
-                    </Button>
-                  </div>
-
-                  <div className="md:col-span-3 space-y-2">
-                    <label className="text-sm font-medium">Reason for Quarantine</label>
-                    <Textarea
-                      placeholder="Describe the reason for quarantine..."
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+        
 
             {/* Quarantine Records List */}
             <Card>
