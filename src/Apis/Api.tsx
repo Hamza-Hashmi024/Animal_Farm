@@ -195,3 +195,12 @@ export const RegisterQuarantine = async (data: any) => {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
+
+export const GetQuarantineRecord = async () =>{
+  try {
+    const response = await axios.get(`${Base_Url}/api/quarantine`)
+    return response.data
+  }catch(error : any ){
+     throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+};
