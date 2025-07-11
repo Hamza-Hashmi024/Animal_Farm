@@ -108,8 +108,51 @@ const RecordSlaughter = (req, res) => {
   });
 
 };
+// const View_Record_Slaughter = async (req, res) => {
+//   try {
+//     const [rows] = await db.promise().query(`
+//       SELECT
+//         COUNT(*) AS totalProcessed,
+//         ROUND(AVG(carcass_weight), 2) AS avgCarcassWeight,
+//         ROUND(AVG(carcass_ratio), 2) AS avgCarcassRatio,
+//         SUM(carcass_quality = 'grade-a') AS qualityGradeA
+//       FROM slaughter_records
+//     `);
+
+//     return res.status(200).json({
+//       message: "Slaughter statistics fetched successfully",
+//       data: rows[0],
+//     });
+//   } catch (error) {
+//     console.error("Error fetching slaughter stats:", error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+const View_Record_Slaughter = async (req, res) => {
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT
+        COUNT(*) AS totalProcessed,
+        ROUND(AVG(carcass_weight), 2) AS avgCarcassWeight,
+        ROUND(AVG(carcass_ratio), 2) AS avgCarcassRatio,
+        SUM(carcass_quality = 'grade-a') AS qualityGradeA
+      FROM slaughter_records
+    `);
+
+    return res.status(200).json({
+      message: "Slaughter statistics fetched successfully",
+      data: rows[0],
+    });
+  } catch (error) {
+    console.error("Error fetching slaughter stats:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 
 module.exports ={
     RecordSlaughter,
+    View_Record_Slaughter 
 }

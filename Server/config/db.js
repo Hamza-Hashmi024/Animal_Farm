@@ -8,6 +8,8 @@ const db = mysql12.createConnection({
     database : process.env.DB_NAME
 });
 
+
+
 db.connect((err) =>{
     if(err){
         console.error('Error connecting to the database:', err);

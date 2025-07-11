@@ -1,4 +1,4 @@
-
+import { useState , useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -6,14 +6,35 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { SlaughterRecordDialog } from "@/components/SlaughterRecordDialog";
 import { SlaughterRecords } from "@/components/SlaughterRecords";
 import { Beef, Scale, TrendingUp, Award } from "lucide-react";
+import {  ViewRecordSlaughter } from "@/Apis/Api";
 
 const SlaughterRecording = () => {
-  const slaughterStats = {
-    totalProcessed: 24,
-    avgCarcassWeight: 285,
-    avgCarcassRatio: 58.2,
-    qualityGradeA: 18,
-  };
+const [slaughterStats, setSlaughterStats] = useState({
+    totalProcessed: 0,
+    avgCarcassWeight: 0,
+    avgCarcassRatio: 0,
+    qualityGradeA: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+   
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await  ViewRecordSlaughter ();
+        setSlaughterStats(res.data); 
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch stats");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <SidebarProvider>

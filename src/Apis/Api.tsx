@@ -204,3 +204,13 @@ export const GetQuarantineRecord = async () =>{
      throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
+
+
+export const  ViewRecordSlaughter = async ()=>{
+   try {
+    const response = await axios.get(`${Base_Url}/api/stats/view`)
+    return response.data
+  }catch(error : any ){
+     throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+}
