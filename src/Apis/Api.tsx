@@ -185,3 +185,13 @@ export const RecordIncident = async (incidentData) => {
     throw error;
   }
 };
+
+
+export const RegisterQuarantine = async (data: any) => {
+  try {
+    const response = await axios.post(`${Base_Url}/api/quarantine`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+};

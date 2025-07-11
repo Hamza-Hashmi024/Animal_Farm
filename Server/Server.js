@@ -12,7 +12,7 @@ const inverterRoutes = require("./Routes/InverterRoute");
 const deathRoutes = require("./Routes/DeathRoute");
 const SlaughterRoutes = require("./Routes/SlaughterRoutes")
 const IncidentRoute = require("./Routes/IncidentRoutes")
-
+const  QuarantineAnimal = require("./Routes/Quarantine")
 
 app.use(express.json());
 
@@ -29,6 +29,7 @@ app.use("/api", inverterRoutes);
 app.use("/api", deathRoutes);
 app.use("/api", SlaughterRoutes);
 app.use("/api" , IncidentRoute);
+app.use("/api" ,QuarantineAnimal);
 
 app.get("/", (req, res) => {
   res.send(`Server Is Created Successfully on Port ${Port}`);

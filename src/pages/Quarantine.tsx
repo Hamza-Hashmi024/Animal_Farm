@@ -9,12 +9,15 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Shield, Plus, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { QuarantineAnimalDialog } from "@/components/QuarantineAnimalDialog";
 
 const Quarantine = () => {
   const { toast } = useToast();
   const [tag, setTag] = useState("");
   const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 
   const [quarantineRecords] = useState([
     { id: 1, tag: "TAG-234", date: "2024-06-25", reason: "Respiratory infection suspected", status: "Active" },
@@ -60,7 +63,10 @@ const Quarantine = () => {
               <p className="text-gray-600 mt-1">Manage animals in quarantine and add new entries</p>
             </div>
 
-        
+
+
+{/* Render the dialog outside the button */}
+<QuarantineAnimalDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
             {/* Quarantine Records List */}
             <Card>
