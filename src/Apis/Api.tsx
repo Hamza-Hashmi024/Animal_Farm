@@ -255,3 +255,12 @@ export const GetAllFarm = async () => {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
+
+export const GetAllDeathRecord = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/death/stats`);
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+};

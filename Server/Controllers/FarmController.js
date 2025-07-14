@@ -79,5 +79,5 @@ const Get_All_Farm = (req , res ) =>{
 module.exports = {
   registerFarm,
   farm_number,
-  Get_All_Farm 
+  Get_All_Farm, 
 };

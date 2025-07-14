@@ -21,29 +21,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Calendar, Skull, AlertTriangle, HeartOff } from "lucide-react";
-import { useState } from "react";
+import { useState , useEffect } from "react";
+import { GetAllDeathRecord } from "@/Apis/Api";
 
 const Death = () => {
   const [isAddDeathOpen, setIsAddDeathOpen] = useState(false);
-
-  const [deaths, setDeaths] = useState([
-    {
-      id: 1,
-      animalId: "A-001",
-      cause: "Infection",
-      date: new Date("2025-07-07"),
-      location: "Pen 3, Farm A",
-      status: "Reviewed",
-    },
-    {
-      id: 2,
-      animalId: "B-002",
-      cause: "Natural",
-      date: new Date("2025-07-06"),
-      location: "Pen 5, Farm B",
-      status: "Pending",
-    },
-  ]);
+    const [deaths, setDeaths] = useState([]);
 
   const handleAddDeath = (data: Omit<(typeof deaths)[0], "id" | "status">) => {
     const newDeath = {
@@ -57,6 +40,28 @@ const Death = () => {
 
   const reviewedDeaths = deaths.filter((d) => d.status === "Reviewed");
   const pendingDeaths = deaths.filter((d) => d.status === "Pending");
+
+ useEffect(() => {
+    const fetchDeaths = async () => {
+      try {
+        const response = await GetAllDeathRecord();
+        const formattedData = response.map((item: any) => ({
+          id: item.death_id,
+          animalId: item.animal_id,
+          cause: item.major_cause,
+          date: new Date(item.date),
+          location: item.location,
+          status: "Pending", // Set this based on actual field if available
+        }));
+
+        setDeaths(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch death records:", error);
+      }
+    };
+
+    fetchDeaths();
+  }, []);
 
   return (
     <SidebarProvider>
