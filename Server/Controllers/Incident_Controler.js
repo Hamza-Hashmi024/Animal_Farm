@@ -69,7 +69,8 @@ const getRecentIncidents = (req, res) => {
     }
   );
 };
+
 module.exports = {
   RegisterIncident,
-   getRecentIncidents
+  getRecentIncidents,
 };

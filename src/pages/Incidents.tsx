@@ -7,62 +7,86 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { RecentIncidents } from "@/components/RecentIncidents";
 import { ReportIncidentDialog } from "@/components/ReportIncidentDialog";
 import { AlertTriangle, FileText, Clock } from "lucide-react";
+import { GetRecentInjury  } from "@/Apis/Api";
+import {  useState,  useEffect } from "react";
 
 const Incidents = () => {
-  const recentIncidents = [
-    {
-      id: 1,
-      tag: "TAG-127",
-      type: "Injury",
-      farm: "Farm A",
-      pen: "Pen 5",
-      description: "Minor leg injury observed during routine check",
-      priority: "High",
-      date: "2025-06-29",
-      status: "Under Treatment"
-    },
-    {
-      id: 2,
-      tag: "TAG-089",
-      type: "Illness",
-      farm: "Farm B",
-      pen: "Pen 3",
-      description: "Showing signs of respiratory distress",
-      priority: "Medium",
-      date: "2025-06-28",
-      status: "Monitoring"
-    },
-    {
-      id: 3,
-      tag: "TAG-156",
-      type: "Behavioral",
-      farm: "Farm C",
-      pen: "Pen 1",
-      description: "Aggressive behavior towards other animals",
-      priority: "Medium",
-      date: "2025-06-27",
-      status: "Isolated"
-    },
-    {
-      id: 4,
-      tag: "TAG-234",
-      type: "Transport Stress",
-      farm: "Farm A",
-      pen: "Quarantine",
-      description: "Stress symptoms after transport from auction",
-      priority: "Low",
-      date: "2025-06-26",
-      status: "Recovered"
-    },
-  ];
+  // const recentIncidents = [
+  //   {
+  //     id: 1,
+  //     tag: "TAG-127",
+  //     type: "Injury",
+  //     farm: "Farm A",
+  //     pen: "Pen 5",
+  //     description: "Minor leg injury observed during routine check",
+  //     priority: "High",
+  //     date: "2025-06-29",
+  //     status: "Under Treatment"
+  //   },
+  //   {
+  //     id: 2,
+  //     tag: "TAG-089",
+  //     type: "Illness",
+  //     farm: "Farm B",
+  //     pen: "Pen 3",
+  //     description: "Showing signs of respiratory distress",
+  //     priority: "Medium",
+  //     date: "2025-06-28",
+  //     status: "Monitoring"
+  //   },
+  //   {
+  //     id: 3,
+  //     tag: "TAG-156",
+  //     type: "Behavioral",
+  //     farm: "Farm C",
+  //     pen: "Pen 1",
+  //     description: "Aggressive behavior towards other animals",
+  //     priority: "Medium",
+  //     date: "2025-06-27",
+  //     status: "Isolated"
+  //   },
+  //   {
+  //     id: 4,
+  //     tag: "TAG-234",
+  //     type: "Transport Stress",
+  //     farm: "Farm A",
+  //     pen: "Quarantine",
+  //     description: "Stress symptoms after transport from auction",
+  //     priority: "Low",
+  //     date: "2025-06-26",
+  //     status: "Recovered"
+  //   },
+  // ];
 
-  const incidentStats = {
+
+   const [recentIncidents, setRecentIncidents] = useState([]);
+
+
+    useEffect(() => {
+    const fetchIncidents = async () => {
+      try {
+        const response = await GetRecentInjury();
+        if (Array.isArray(response)) {
+          setRecentIncidents(response);
+        } else {
+          console.error("Unexpected response format:", response);
+        }
+      } catch (error) {
+        console.error("Failed to fetch incidents:", error);
+      }
+    };
+
+    fetchIncidents();
+  }, []);
+
+    const incidentStats = {
     total: recentIncidents.length,
-    high: recentIncidents.filter(i => i.priority === 'High').length,
-    medium: recentIncidents.filter(i => i.priority === 'Medium').length,
-    low: recentIncidents.filter(i => i.priority === 'Low').length,
-    resolved: recentIncidents.filter(i => i.status === 'Recovered').length,
+    high: recentIncidents.filter(i => i.priority?.toLowerCase() === 'high').length,
+    medium: recentIncidents.filter(i => i.priority?.toLowerCase() === 'medium').length,
+    low: recentIncidents.filter(i => i.priority?.toLowerCase() === 'low').length,
+    resolved: recentIncidents.filter(i => i.status?.toLowerCase() === 'recovered').length,
   };
+
 
   return (
     <SidebarProvider>
@@ -146,7 +170,7 @@ const Incidents = () => {
 
             {/* Recent Incidents */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <RecentIncidents />
+              <RecentIncidents data={recentIncidents} />
               
               <Card>
                 <CardHeader>

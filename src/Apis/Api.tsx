@@ -264,3 +264,14 @@ export const GetAllDeathRecord = async () => {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
+
+
+export const GetRecentInjury = async () =>{
+try{
+  const response = await axios.get(`${Base_Url}/api/recent`);
+  return response.data;
+}
+catch(error){
+  throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+}
