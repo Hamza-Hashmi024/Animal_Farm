@@ -13,9 +13,6 @@ import { Label } from "@/components/ui/label";
 import { InvestorRegistrationApi, GetAllInvester, GetInvesterById } from "@/Apis/Api";
 
 const Investors = () => {
-  const [selectedInvestorId, setSelectedInvestorId] = useState<string | null>(null);
-const [selectedInvestorData, setSelectedInvestorData] = useState<any>(null);
-const [showInvestorDialog, setShowInvestorDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [investors, setInvestors] = useState<any[]>([]);
