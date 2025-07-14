@@ -42,6 +42,34 @@ const RegisterIncident = async (req, res) => {
   }
 };
 
+const getRecentIncidents = (req, res) => {
+  db.query(
+    `
+      SELECT 
+        id,
+        animal_tag AS tag,
+        incident_type AS type,
+        farm,
+        pen,
+        description,
+        priority,
+        DATE(reported_at) AS date,
+        'Unknown' AS status
+      FROM animal_incidents
+      ORDER BY reported_at DESC
+      LIMIT 10
+    `,
+    (error, results) => {
+      if (error) {
+        console.error("Error fetching incidents:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      res.status(200).json(results);
+    }
+  );
+};
 module.exports = {
   RegisterIncident,
+   getRecentIncidents
 };
