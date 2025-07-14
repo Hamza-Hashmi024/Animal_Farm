@@ -62,8 +62,22 @@ const farm_number = (req, res) => {
   });
 };
 
+const Get_All_Farm = (req , res ) =>{
+   
+    const querry = `Select  * from farms `
+    db.query(querry , (err , results ) => {
+      if(err){
+        console.error("Error fetching farm numbers:", err);
+      }else{
+        res.status(200).json(results)
+      }
+    })
+  
+}
+
 
 module.exports = {
   registerFarm,
-  farm_number
+  farm_number,
+  Get_All_Farm 
 };
