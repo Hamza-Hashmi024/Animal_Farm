@@ -178,14 +178,16 @@ export const RecordSlaughter = async (data: any) => {
 
 export const RecordIncident = async (incidentData) => {
   try {
-    const response = await axios.post(`${Base_Url}/api/Register/incident`, incidentData);
+    const response = await axios.post(
+      `${Base_Url}/api/Register/incident`,
+      incidentData
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to record incident:", error);
     throw error;
   }
 };
-
 
 export const RegisterQuarantine = async (data: any) => {
   try {
@@ -196,30 +198,30 @@ export const RegisterQuarantine = async (data: any) => {
   }
 };
 
-export const GetQuarantineRecord = async () =>{
+export const GetQuarantineRecord = async () => {
   try {
-    const response = await axios.get(`${Base_Url}/api/quarantine`)
-    return response.data
-  }catch(error : any ){
-     throw error?.response?.data || { message: "Unknown error occurred" };
+    const response = await axios.get(`${Base_Url}/api/quarantine`);
+    return response.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
 
-
-export const  ViewRecordSlaughter = async ()=>{
-   try {
-    const response = await axios.get(`${Base_Url}/api/stats/view`)
-    return response.data
-  }catch(error : any ){
-     throw error?.response?.data || { message: "Unknown error occurred" };
+export const ViewRecordSlaughter = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/stats/view`);
+    return response.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
   }
-}
- 
+};
 
 export const ViewRecentSlaughterRecords = async () => {
   try {
-    const response = await axios.get(`${Base_Url}/api/slaughter/records/recent`);
-    console.log("Fetched records:", response); 
+    const response = await axios.get(
+      `${Base_Url}/api/slaughter/records/recent`
+    );
+    console.log("Fetched records:", response);
 
     return response.data.data || [];
   } catch (error) {
@@ -227,14 +229,23 @@ export const ViewRecentSlaughterRecords = async () => {
   }
 };
 
-
-export const GetAllInvester = async () =>{
+export const GetAllInvester = async () => {
   try {
-    const response = await axios.get(`${Base_Url}/api/invester`)
-    return response.data
+    const response = await axios.get(`${Base_Url}/api/invester`);
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+};
 
-  }catch(error){
+
+
+
+export const GetInvesterById = async (id: number | string) => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/invester/${id}`);
+    return response.data;
+  } catch (error) {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
 }
-

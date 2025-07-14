@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,12 @@ import { InvestorCard } from "@/components/InvestorCard";
 import { Search, Filter, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { InvestorRegistrationApi, GetAllInvester } from "@/Apis/Api";
+import { InvestorRegistrationApi, GetAllInvester, GetInvesterById } from "@/Apis/Api";
 
 const Investors = () => {
+  const [selectedInvestorId, setSelectedInvestorId] = useState<string | null>(null);
+const [selectedInvestorData, setSelectedInvestorData] = useState<any>(null);
+const [showInvestorDialog, setShowInvestorDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [investors, setInvestors] = useState<any[]>([]);
@@ -23,6 +26,16 @@ const Investors = () => {
     totalInvestment: 0,
   });
 
+
+
+
+const filteredInvestors = useMemo(() => 
+  investors.filter((investor) =>
+    investor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(investor.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    investor.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ), [investors, searchTerm]
+);
   // Fetch investors using useEffect
   useEffect(() => {
     const fetchInvestors = async () => {
@@ -37,12 +50,7 @@ const Investors = () => {
     fetchInvestors();
   }, []);
 
-  const filteredInvestors = investors.filter((investor) =>
-    investor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    investor.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    investor.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+ 
   const totalInvestment = investors.reduce((sum, inv) => sum + parseFloat(inv.total_investment), 0);
   const totalAnimals = 13; 
   const avgROI = investors.length > 0 ? investors.reduce((sum, inv) => sum + (inv.roi || 0), 0) / investors.length : 0;
@@ -68,6 +76,7 @@ const Investors = () => {
       console.error("Error adding investor:", error);
     }
   };
+
 
   return (
     <SidebarProvider>
