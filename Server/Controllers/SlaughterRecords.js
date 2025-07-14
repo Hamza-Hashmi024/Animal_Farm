@@ -108,26 +108,6 @@ const RecordSlaughter = (req, res) => {
   });
 
 };
-// const View_Record_Slaughter = async (req, res) => {
-//   try {
-//     const [rows] = await db.promise().query(`
-//       SELECT
-//         COUNT(*) AS totalProcessed,
-//         ROUND(AVG(carcass_weight), 2) AS avgCarcassWeight,
-//         ROUND(AVG(carcass_ratio), 2) AS avgCarcassRatio,
-//         SUM(carcass_quality = 'grade-a') AS qualityGradeA
-//       FROM slaughter_records
-//     `);
-
-//     return res.status(200).json({
-//       message: "Slaughter statistics fetched successfully",
-//       data: rows[0],
-//     });
-//   } catch (error) {
-//     console.error("Error fetching slaughter stats:", error);
-//     return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
 
 const View_Record_Slaughter = async (req, res) => {
   try {
@@ -150,9 +130,46 @@ const View_Record_Slaughter = async (req, res) => {
   }
 };
 
+const View_Recent_Slaughter_Records = async (req, res) => {
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT 
+        id,
+        animal_tag AS animalTag,
+        DATE_FORMAT(slaughter_date, '%Y-%m-%d') AS slaughterDate,
+        weight_before_slaughter AS weightBeforeSlaughter,
+        final_weight_gain AS finalWeightGain,
+        carcass_weight AS carcassWeight,
+        carcass_ratio AS carcassRatio,
+        CONCAT(
+          UPPER(SUBSTRING(carcass_quality, 1, 1)), 
+          LOWER(SUBSTRING(carcass_quality, 2)), 
+          CASE 
+            WHEN carcass_quality = 'grade-a' THEN ' - Premium'
+            WHEN carcass_quality = 'grade-b' THEN ' - Standard'
+            WHEN carcass_quality = 'grade-c' THEN ' - Commercial'
+            ELSE ''
+          END
+        ) AS carcassQuality,
+        customer_feedback AS customerFeedback
+      FROM slaughter_records
+      ORDER BY slaughter_date DESC
+      LIMIT 4
+    `);
+
+    return res.status(200).json({
+      message: "Recent slaughter records fetched successfully",
+      data: rows,
+    });
+  } catch (error) {
+    console.error("Error fetching slaughter records:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 
 module.exports ={
     RecordSlaughter,
-    View_Record_Slaughter 
+    View_Record_Slaughter,
+    View_Recent_Slaughter_Records 
 }

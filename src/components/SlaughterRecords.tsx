@@ -1,70 +1,74 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Calendar, Scale, TrendingUp } from "lucide-react";
+import { ViewRecentSlaughterRecords } from "@/Apis/Api";
+import React, { useEffect, useState } from "react";
+
+type SlaughterRecord = {
+  id: number;
+  animalTag: string;
+  slaughterDate: string;
+  weightBeforeSlaughter: number;
+  finalWeightGain: number;
+  carcassWeight: number;
+  carcassRatio: number;
+  carcassQuality: string;
+  customerFeedback?: string;
+};
 
 export function SlaughterRecords() {
-  const slaughterRecords = [
-    {
-      id: 1,
-      animalTag: "TAG-127",
-      slaughterDate: "2025-06-28",
-      weightBeforeSlaughter: 450,
-      finalWeightGain: 125,
-      carcassWeight: 285,
-      carcassRatio: 63.3,
-      carcassQuality: "Grade A - Premium",
-      customerFeedback: "Excellent marbling and tenderness"
-    },
-    {
-      id: 2,
-      animalTag: "TAG-089",
-      slaughterDate: "2025-06-27",
-      weightBeforeSlaughter: 425,
-      finalWeightGain: 110,
-      carcassWeight: 255,
-      carcassRatio: 60.0,
-      carcassQuality: "Grade B - Standard",
-      customerFeedback: "Good quality, met expectations"
-    },
-    {
-      id: 3,
-      animalTag: "TAG-156",
-      slaughterDate: "2025-06-26",
-      weightBeforeSlaughter: 475,
-      finalWeightGain: 140,
-      carcassWeight: 298,
-      carcassRatio: 62.7,
-      carcassQuality: "Grade A - Premium",
-      customerFeedback: "Premium cut quality, very satisfied"
-    },
-    {
-      id: 4,
-      animalTag: "TAG-234",
-      slaughterDate: "2025-06-25",
-      weightBeforeSlaughter: 435,
-      finalWeightGain: 105,
-      carcassWeight: 245,
-      carcassRatio: 56.3,
-      carcassQuality: "Grade C - Commercial",
-      customerFeedback: "Acceptable for commercial use"
-    },
-  ];
+  const [slaughterRecords, setSlaughterRecords] = useState<SlaughterRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchRecords() {
+      try {
+        const response = await ViewRecentSlaughterRecords();
+        console.log("Fetched records:", response);
+
+        const recordsRaw = response?.data?.data ?? [];
+
+        const records: SlaughterRecord[] = recordsRaw.map((record: any) => ({
+          ...record,
+          weightBeforeSlaughter: parseFloat(record.weightBeforeSlaughter),
+          finalWeightGain: parseFloat(record.finalWeightGain),
+          carcassWeight: parseFloat(record.carcassWeight),
+          carcassRatio: parseFloat(record.carcassRatio),
+        }));
+
+        setSlaughterRecords(records);
+      } catch (err: any) {
+        setError(err.message || "Failed to load records.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRecords();
+  }, []);
 
   const getQualityBadgeVariant = (quality: string) => {
-    if (quality.includes("Grade A")) return "default";
-    if (quality.includes("Grade B")) return "secondary";
-    if (quality.includes("Grade C")) return "outline";
+    const lower = quality.toLowerCase();
+    if (lower.includes("grade a")) return "default";
+    if (lower.includes("grade b")) return "secondary";
+    if (lower.includes("grade c")) return "outline";
     return "destructive";
   };
 
-  const getQualityColor = (quality: string) => {
-    if (quality.includes("Grade A")) return "text-green-600";
-    if (quality.includes("Grade B")) return "text-blue-600";
-    if (quality.includes("Grade C")) return "text-amber-600";
-    return "text-red-600";
-  };
+  const bestCarcassRatio = Math.max(...slaughterRecords.map((r) => r.carcassRatio || 0));
+  const highestCarcassWeight = Math.max(...slaughterRecords.map((r) => r.carcassWeight || 0));
+
+  const total = slaughterRecords.length;
+  const gradeACount = slaughterRecords.filter((r) => r.carcassQuality.toLowerCase().includes("grade a")).length;
+  const gradeBCount = slaughterRecords.filter((r) => r.carcassQuality.toLowerCase().includes("grade b")).length;
+  const gradeCCount = slaughterRecords.filter((r) => r.carcassQuality.toLowerCase().includes("grade c")).length;
+
+  const getPercentage = (count: number) => (total ? ((count / total) * 100).toFixed(0) : "0");
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
