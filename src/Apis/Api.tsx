@@ -221,9 +221,20 @@ export const ViewRecentSlaughterRecords = async () => {
     const response = await axios.get(`${Base_Url}/api/slaughter/records/recent`);
     console.log("Fetched records:", response); 
 
-    // ✅ CORRECT: return response.data.data directly
     return response.data.data || [];
   } catch (error) {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
 };
+
+
+export const GetAllInvester = async () =>{
+  try {
+    const response = await axios.get(`${Base_Url}/api/invester`)
+    return response.data
+
+  }catch(error){
+    throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+}
+

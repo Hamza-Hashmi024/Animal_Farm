@@ -1,8 +1,9 @@
+const { create } = require("node:domain");
 const db = require("../config/db");
 
 const registerInvester = async (req, res) => {
   try {
-    const { name, email, phone, totalInvestment } = req.body;
+    const { name, email, phone,  total_investment} = req.body;
 
     const query = `
       INSERT INTO investors (name, email, phone, total_investment)
@@ -12,7 +13,7 @@ const registerInvester = async (req, res) => {
       name.trim(),
       email.trim(),
       phone ? phone.trim() : null,
-      Number(totalInvestment)
+      Number( total_investment)
     ];
 
     await db.execute(query, values);
@@ -42,12 +43,38 @@ const InvesterName = (req, res) => {
   });
 };
 
+// GET all investors
+const getAllInvestors = (req, res) => {
+  db.query("SELECT * FROM investors", (err, results) => {
+    if (err) {
+      console.error("Error fetching investors:", err);
+      return res.status(500).json({ error: "Failed to fetch investors." });
+    }
+    res.json(results);
+  });
+};
 
+// GET investor by ID
+const getInvestorById = (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT * FROM investors WHERE id = ?", [id], (err, results) => {
+    if (err) {
+      console.error("Error fetching investor:", err);
+      return res.status(500).json({ error: "Failed to fetch investor." });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Investor not found." });
+    }
+    res.json(results[0]);
+  });
+};
 
 
 
 
 module.exports = {
   registerInvester,
-  InvesterName
+  InvesterName,
+   getAllInvestors ,
+    getInvestorById
 };
