@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState,  useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { AddFarmDialog } from "@/components/AddFarmDialog";
 import { MapPin, Plus, Calendar, Grid, BarChart3 } from "lucide-react";
+import { GetAllFarm } from "@/Apis/Api";
+
 
 interface Farm {
   id: string;
@@ -20,35 +22,36 @@ interface Farm {
 }
 
 const Farms = () => {
-  const [farms, setFarms] = useState<Farm[]>([
-    {
-      id: "1",
-      farmNumber: "Farm A",
-      address: "Gulberg III, Lahore, Punjab, Pakistan",
-      numberOfPens: 12,
-      area: 50.5,
-      startDate: "2024-01-15",
-      status: "Active"
-    },
-    {
-      id: "2", 
-      farmNumber: "Farm B",
-      address: "DHA Phase 5, Karachi, Sindh, Pakistan",
-      numberOfPens: 18,
-      area: 75.2,
-      startDate: "2024-02-20",
-      status: "Active"
-    },
-    {
-      id: "3",
-      farmNumber: "Farm C", 
-      address: "F-6 Sector, Islamabad, Pakistan",
-      numberOfPens: 8,
-      area: 32.8,
-      startDate: "2024-03-10",
-      status: "Inactive"
-    }
-  ]);
+  const [farms, setFarms] = useState<Farm[]>([]);
+  // const [farms, setFarms] = useState<Farm[]>([
+  //   {
+  //     id: "1",
+  //     farmNumber: "Farm A",
+  //     address: "Gulberg III, Lahore, Punjab, Pakistan",
+  //     numberOfPens: 12,
+  //     area: 50.5,
+  //     startDate: "2024-01-15",
+  //     status: "Active"
+  //   },
+  //   {
+  //     id: "2", 
+  //     farmNumber: "Farm B",
+  //     address: "DHA Phase 5, Karachi, Sindh, Pakistan",
+  //     numberOfPens: 18,
+  //     area: 75.2,
+  //     startDate: "2024-02-20",
+  //     status: "Active"
+  //   },
+  //   {
+  //     id: "3",
+  //     farmNumber: "Farm C", 
+  //     address: "F-6 Sector, Islamabad, Pakistan",
+  //     numberOfPens: 8,
+  //     area: 32.8,
+  //     startDate: "2024-03-10",
+  //     status: "Inactive"
+  //   }
+  // ]);
 
   const [isAddFarmOpen, setIsAddFarmOpen] = useState(false);
 
@@ -64,7 +67,34 @@ const Farms = () => {
 
   const activeFarms = farms.filter(farm => farm.status === "Active");
   const totalPens = farms.reduce((sum, farm) => sum + farm.numberOfPens, 0);
-  const totalArea = farms.reduce((sum, farm) => sum + farm.area, 0);
+  const totalArea = farms.reduce((sum, farm) => sum + Number(farm.area || 0), 0);
+
+   useEffect(() => {
+  const fetchFarms = async () => {
+    try {
+      const response = await GetAllFarm();
+
+      const formattedFarms: Farm[] = response.map((farm: any) => ({
+  id: String(farm.id),
+  farmNumber: farm.farm_number,
+  address: farm.address,
+  numberOfPens: Number(farm.number_of_pens),
+  area: Number(farm.area),
+  startDate: farm.start_date,
+  status: "Active", 
+}));
+
+setFarms(formattedFarms);
+     
+      console.log("Fetched farms:", response);
+    } catch (error) {
+      console.error("Failed to fetch farms:", error);
+    }
+  };
+
+  fetchFarms();
+}, []);
+
 
   return (
     <SidebarProvider>

@@ -238,9 +238,6 @@ export const GetAllInvester = async () => {
   }
 };
 
-
-
-
 export const GetInvesterById = async (id: number | string) => {
   try {
     const response = await axios.get(`${Base_Url}/api/invester/${id}`);
@@ -248,4 +245,13 @@ export const GetInvesterById = async (id: number | string) => {
   } catch (error) {
     throw error?.response?.data || { message: "Unknown error occurred" };
   }
-}
+};
+
+export const GetAllFarm = async () => {
+  try {
+    const response = await axios.get(`${Base_Url}/api/farm`);
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data || { message: "Unknown error occurred" };
+  }
+};
